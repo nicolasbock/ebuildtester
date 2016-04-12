@@ -1,0 +1,80 @@
+#!/usr/bin/env python
+
+
+def massage_string(string):
+    """Return a string."""
+
+    import sys
+
+    if sys.version_info[0] < 3:
+        return string
+    else:
+        return string.decode("UTF-8")
+
+
+class Docker:
+
+    def __init__(self):
+        """Create a new container."""
+
+        import subprocess
+
+        docker = subprocess.Popen(["docker", "run", "--detach",
+            "--volume=/home/nbock/gentoo:/usr/portage",
+            "--volume=/usr/portage/distfiles:/usr/portage/distfiles",
+            "gentoo/stage3-amd64-nomultilib"], stdout=subprocess.PIPE)
+        docker.wait()
+        if docker.returncode != 0:
+            raise Exception("failure creating docker container")
+        lines = docker.stdout.readlines()
+        if len(lines) > 1:
+            raise Exception("more output than expected")
+        self.cid = massage_string(lines[0]).strip()
+
+
+    def exec(self, cmd, interactive=False):
+        """Execute command in container.
+
+        cmd is a string which is executed within a bash shell.
+        """
+
+        import subprocess
+
+        docker_cmd = ["docker", "exec", "--tty"]
+        if interactive:
+            docker_cmd += ["--interactive"]
+        docker_cmd += [self.cid, "/bin/bash", "-c", cmd]
+        docker = subprocess.Popen(docker_cmd)
+        docker.wait()
+
+
+def main():
+    """The main function."""
+
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "ATOM",
+        help="The package atom to test")
+    parser.add_argument(
+        "--use",
+        help="The use flags for the ATOM",
+        nargs="+")
+    options = parser.parse_args()
+    container = Docker()
+    print("created container " + container.cid)
+    container.exec("echo %s ~amd64 >> /etc/portage/package.accept_keywords" %
+            (options.ATOM))
+    container.exec("echo %s %s >> /etc/portage/package.use/testbuild" %
+            (options.ATOM, " ".join(options.use)))
+    container.exec("emerge --verbose %s" % (options.ATOM))
+    container.exec("/bin/bash", interactive=True)
+
+
+if __name__ == "__main__":
+    main()
+else:
+    raise Exception("can not be imported")
+
+
