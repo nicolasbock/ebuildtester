@@ -31,6 +31,9 @@ class Docker:
         if len(lines) > 1:
             raise Exception("more output than expected")
         self.cid = massage_string(lines[0]).strip()
+        # Disable the usersandbox feature, it's not working well inside a
+        # docker container.
+        self.exec("echo FEATURES=\"-usersandbox\" >> /etc/portage/make.conf")
 
     def exec(self, cmd, interactive=False):
         """Execute command in container.
@@ -48,6 +51,7 @@ class Docker:
         docker = subprocess.Popen(docker_cmd)
         docker.wait()
         if docker.returncode != 0:
+            print("running in container %s" % (str(self.cid)))
             raise Exception("failed command \"%s\"" % (cmd))
 
     def shell(self):
