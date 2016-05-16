@@ -14,14 +14,19 @@ def massage_string(string):
 
 class Docker:
 
-    def __init__(self):
-        """Create a new container."""
+    def __init__(self, local_portage, update=True, threads=1):
+        """Create a new container.
+
+        local_portage is the path to the local portage repository. The
+        update argument specifies whether to update the container. The threads
+        variable specifies how many threads emerge should use.
+        """
 
         import subprocess
 
         docker = subprocess.Popen(
             ["docker", "run", "--detach", "--tty",
-                "--volume=/home/nbock/gentoo:/usr/portage",
+                "--volume=%s:/usr/portage" % (local_portage),
                 "--volume=/usr/portage/distfiles:/usr/portage/distfiles",
                 "gentoo/stage3-amd64-nomultilib"], stdout=subprocess.PIPE)
         docker.wait()
@@ -31,9 +36,18 @@ class Docker:
         if len(lines) > 1:
             raise Exception("more output than expected")
         self.cid = massage_string(lines[0]).strip()
+        # Update bash environment.
+        self.exec("echo HISTORY=1000 >> /root/.bashrc")
         # Disable the usersandbox feature, it's not working well inside a
         # docker container.
-        self.exec("echo FEATURES=\"-usersandbox\" >> /etc/portage/make.conf")
+        self.exec("echo FEATURES=\\\"-sandbox -usersandbox\\\" " +
+                  ">> /etc/portage/make.conf")
+        self.exec(("echo MAKEOPTS=\\\"-j%d\\\" " % (threads)) +
+                  ">> /etc/portage/make.conf")
+        self.exec("emerge --info")
+        # Update.
+        if update:
+            self.exec("emerge --update --deep --newuse @world")
 
     def exec(self, cmd, interactive=False):
         """Execute command in container.
@@ -75,12 +89,28 @@ def main():
         "ATOM",
         help="The package atom to test")
     parser.add_argument(
+        "--portage-dir",
+        help="The local portage directory",
+        required=True)
+    parser.add_argument(
+        "--no-update",
+        help="Do not update container before installing ATOM",
+        default=False,
+        action="store_true")
+    parser.add_argument(
+        "--threads",
+        metavar="N",
+        help="Use N threads to build packages",
+        default=1,
+        type=int)
+    parser.add_argument(
         "--use",
         help="The use flags for the ATOM",
         nargs="+")
     options = parser.parse_args()
     print("creating container")
-    container = Docker()
+    container = Docker(options.portage_dir, update=(not options.no_update),
+                       threads=options.threads)
     print("created container " + container.cid)
     container.exec(
         "echo \"%s\" ~amd64 >> /etc/portage/package.accept_keywords" %
@@ -89,8 +119,8 @@ def main():
     if not (options.use is None) and len(options.use) > 0:
         container.exec("echo %s %s >> /etc/portage/package.use/testbuild" %
                        (options.ATOM, " ".join(options.use)))
-    container.exec("emerge --ask --verbose %s" % (options.ATOM),
-                   interactive=True)
+    container.exec("/bin/bash -c 'emerge --ask --verbose %s'" %
+                   (options.ATOM), interactive=True)
     container.shell()
 
 
