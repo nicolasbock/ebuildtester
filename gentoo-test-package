@@ -83,6 +83,7 @@ def main():
     """The main function."""
 
     import argparse
+    import os.path
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -109,7 +110,8 @@ def main():
         nargs="+")
     options = parser.parse_args()
     print("creating container")
-    container = Docker(options.portage_dir, update=(not options.no_update),
+    container = Docker(os.path.abspath(options.portage_dir),
+                       update=(not options.no_update),
                        threads=options.threads)
     print("created container " + container.cid)
     container.exec(
