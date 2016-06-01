@@ -24,11 +24,13 @@ class Docker:
 
         import subprocess
 
-        docker = subprocess.Popen(
-            ["docker", "run", "--detach", "--tty",
-                "--volume=%s:/usr/portage" % (local_portage),
-                "--volume=/usr/portage/distfiles:/usr/portage/distfiles",
-                "gentoo/stage3-amd64-nomultilib"], stdout=subprocess.PIPE)
+        docker_args = [
+            "docker", "run", "--detach", "--tty",
+            "--volume=%s:/usr/portage" % (local_portage),
+            "--volume=/usr/portage/distfiles:/usr/portage/distfiles",
+            "gentoo/stage3-amd64-nomultilib"]
+        print("creating docker container with: %s" % (" ".join(docker_args)))
+        docker = subprocess.Popen(docker_args, stdout=subprocess.PIPE)
         docker.wait()
         if docker.returncode != 0:
             raise Exception("failure creating docker container")
@@ -121,8 +123,7 @@ def main():
     if not (options.use is None) and len(options.use) > 0:
         container.exec("echo %s %s >> /etc/portage/package.use/testbuild" %
                        (options.ATOM, " ".join(options.use)))
-    container.exec("/bin/bash -c 'emerge --ask --verbose %s'" %
-                   (options.ATOM), interactive=True)
+    container.exec("emerge --ask --verbose %s" % (options.ATOM))
     container.shell()
 
 
