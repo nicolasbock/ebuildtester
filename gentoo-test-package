@@ -32,6 +32,9 @@ class Docker:
             print(massage_string(line).rstrip())
         docker_args = [
             "docker", "run", "--detach", "--tty",
+            "--cap-add", "SYS_ADMIN",
+            "--device", "/dev/fuse",
+            "--workdir", "/root",
             "--volume=%s:/usr/portage" % (local_portage),
             "--volume=/usr/portage/distfiles:/usr/portage/distfiles",
             docker_container]
@@ -129,6 +132,8 @@ def main():
     if not (options.use is None) and len(options.use) > 0:
         container.exec("echo %s %s >> /etc/portage/package.use/testbuild" %
                        (options.ATOM, " ".join(options.use)))
+    container.exec("echo emerge --ask --verbose %s >> ~/.bash_history" %
+                   (options.ATOM))
     try:
         container.exec("emerge --ask --verbose %s" % (options.ATOM),
                        interactive=True)
