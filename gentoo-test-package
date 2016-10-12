@@ -174,7 +174,6 @@ def main():
         print("ignoring failure of command")
     container.shell()
 
-
 if __name__ == "__main__":
     main()
 else:
