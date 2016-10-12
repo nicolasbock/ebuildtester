@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+import logging
+
+log = logging.getLogger("test-package")
 options = None
 
 
@@ -29,10 +32,8 @@ class Docker:
 
         docker_container = "gentoo/stage3-amd64-nomultilib"
         docker_args = ["docker", "pull", docker_container]
-        docker = subprocess.Popen(docker_args, stdout=subprocess.PIPE)
+        docker = subprocess.Popen(docker_args)
         docker.wait()
-        for line in docker.stdout:
-            print(massage_string(line).rstrip())
         docker_args = [
             "docker", "run", "--detach", "--tty",
             "--cap-add", "SYS_ADMIN",
@@ -41,7 +42,8 @@ class Docker:
             "--volume=%s:/usr/portage" % (local_portage),
             "--volume=/usr/portage/distfiles:/usr/portage/distfiles",
             docker_container]
-        print("creating docker container with: %s" % (" ".join(docker_args)))
+        log.info("creating docker container with: %s" %
+                 (" ".join(docker_args)))
         docker = subprocess.Popen(docker_args, stdout=subprocess.PIPE)
         docker.wait()
         if docker.returncode != 0:
@@ -83,7 +85,9 @@ class Docker:
 
         import subprocess
 
-        print("running \"%s\" in container" % (cmd))
+        global log
+
+        log.info("running \"%s\" in container" % (cmd))
         docker_cmd = ["docker", "exec"]
         if interactive:
             docker_cmd += ["--tty", "--interactive"]
@@ -91,7 +95,7 @@ class Docker:
         docker = subprocess.Popen(docker_cmd)
         docker.wait()
         if docker.returncode != 0:
-            print("running in container %s" % (str(self.cid)))
+            log.error("running in container %s" % (str(self.cid)))
             raise Exception("failed command \"%s\"" % (cmd))
 
     def shell(self):
@@ -99,7 +103,9 @@ class Docker:
 
         import subprocess
 
-        print("running interactive shell in container")
+        global log
+
+        log.info("running interactive shell in container")
         docker = subprocess.Popen(["docker", "exec", "--tty", "--interactive",
                                   self.cid, "/bin/bash"])
         docker.wait()
@@ -147,17 +153,26 @@ def main():
 
     import os.path
 
+    global log
     global options
+
+    log.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.INFO)
+    ch.setFormatter(logging.Formatter("%(asctime)s - %(message)s"))
+    log.addHandler(ch)
+
+    log.info("starting")
 
     parse_commandline()
 
-    print("creating container")
+    log.info("creating container")
     container = Docker(os.path.abspath(options.portage_dir),
                        update=(not options.no_update),
                        threads=options.threads,
                        gcc_version=options.gcc_version)
 
-    print("created container " + container.cid)
+    log.info("created container " + container.cid)
     container.execute(
         "echo \"%s\" ~amd64 >> /etc/portage/package.accept_keywords" %
         (options.ATOM))
@@ -171,7 +186,7 @@ def main():
         container.execute("emerge --ask --verbose %s" % (options.ATOM),
                           interactive=True)
     except Exception:
-        print("ignoring failure of command")
+        log.warn("ignoring failure of command")
     container.shell()
 
 if __name__ == "__main__":
