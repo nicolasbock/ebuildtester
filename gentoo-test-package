@@ -170,7 +170,7 @@ def main():
     try:
         container.execute("emerge --ask --verbose %s" % (options.ATOM),
                           interactive=True)
-    except Exception as e:
+    except Exception:
         print("ignoring failure of command")
     container.shell()
 
