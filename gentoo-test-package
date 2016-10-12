@@ -47,20 +47,22 @@ class Docker:
         if len(lines) > 1:
             raise Exception("more output than expected")
         self.cid = massage_string(lines[0]).strip()
+
         # Update bash environment.
-        self.exec("echo HISTORY=1000 >> /root/.bashrc")
+        self.execute("echo HISTORY=1000 >> /root/.bashrc")
+
         # Disable the usersandbox feature, it's not working well inside a
         # docker container.
-        self.exec("echo FEATURES=\\\"-sandbox -usersandbox\\\" " +
-                  ">> /etc/portage/make.conf")
-        self.exec(("echo MAKEOPTS=\\\"-j%d\\\" " % (threads)) +
-                  ">> /etc/portage/make.conf")
-        self.exec("emerge --info")
+        self.execute("echo FEATURES=\\\"-sandbox -usersandbox\\\" " +
+                     ">> /etc/portage/make.conf")
+        self.execute(("echo MAKEOPTS=\\\"-j%d\\\" " % (threads)) +
+                     ">> /etc/portage/make.conf")
+        self.execute("emerge --info")
         # Update.
         if update:
-            self.exec("emerge --update --deep --newuse @world")
+            self.execute("emerge --update --deep --newuse @world")
 
-    def exec(self, cmd, interactive=False):
+    def execute(self, cmd, interactive=False):
         """Execute command in container.
 
         cmd is a string which is executed within a bash shell.
@@ -125,18 +127,18 @@ def main():
                        update=(not options.no_update),
                        threads=options.threads)
     print("created container " + container.cid)
-    container.exec(
+    container.execute(
         "echo \"%s\" ~amd64 >> /etc/portage/package.accept_keywords" %
         (options.ATOM))
-    container.exec("cat /etc/portage/package.accept_keywords")
+    container.execute("cat /etc/portage/package.accept_keywords")
     if not (options.use is None) and len(options.use) > 0:
-        container.exec("echo %s %s >> /etc/portage/package.use/testbuild" %
-                       (options.ATOM, " ".join(options.use)))
-    container.exec("echo emerge --ask --verbose %s >> ~/.bash_history" %
-                   (options.ATOM))
+        container.execute("echo %s %s >> /etc/portage/package.use/testbuild" %
+                          (options.ATOM, " ".join(options.use)))
+    container.execute("echo emerge --ask --verbose %s >> ~/.bash_history" %
+                      (options.ATOM))
     try:
-        container.exec("emerge --ask --verbose %s" % (options.ATOM),
-                       interactive=True)
+        container.execute("emerge --ask --verbose %s" % (options.ATOM),
+                          interactive=True)
     except Exception as e:
         print("ignoring failure of command")
     container.shell()
