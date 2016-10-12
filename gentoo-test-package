@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+options = None
+
 
 def massage_string(string):
     """Return a string."""
@@ -92,11 +94,12 @@ class Docker:
         docker.wait()
 
 
-def main():
-    """The main function."""
+def parse_commandline():
+    """Parse the command line."""
 
     import argparse
-    import os.path
+
+    global options
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -122,6 +125,17 @@ def main():
         help="The use flags for the ATOM",
         nargs="+")
     options = parser.parse_args()
+
+
+def main():
+    """The main function."""
+
+    import os.path
+
+    global options
+
+    parse_commandline()
+
     print("creating container")
     container = Docker(os.path.abspath(options.portage_dir),
                        update=(not options.no_update),
