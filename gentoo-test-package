@@ -16,7 +16,8 @@ def massage_string(string):
 
 class Docker:
 
-    def __init__(self, local_portage, update=True, threads=1):
+    def __init__(self, local_portage, update=True, threads=1,
+                 gcc_version=None):
         """Create a new container.
 
         local_portage is the path to the local portage repository. The
@@ -63,6 +64,16 @@ class Docker:
         # Update.
         if update:
             self.execute("emerge --update --deep --newuse @world")
+
+        # Set gcc version.
+        if gcc_version:
+            self.execute(("echo =sys-devel/gcc-%s ** >> " % gcc_version) +
+                         "/etc/portage/package.accept_keywords")
+            self.execute("emerge --verbose sys-devel/gcc")
+            self.execute("gcc-config $(gcc-config --list-profiles | " +
+                         ("grep ${%s/%%-r*/} |" % gcc_version) +
+                         "sed -e 's:^.*\[\([0-9]\+\)\].*:\\1:')")
+            self.execute("emerge --oneshot sys-devel/libtool")
 
     def execute(self, cmd, interactive=False):
         """Execute command in container.
@@ -124,6 +135,10 @@ def parse_commandline():
         "--use",
         help="The use flags for the ATOM",
         nargs="+")
+    parser.add_argument(
+        "--gcc-version",
+        metavar="VER",
+        help="Use gcc version VER")
     options = parser.parse_args()
 
 
@@ -139,7 +154,9 @@ def main():
     print("creating container")
     container = Docker(os.path.abspath(options.portage_dir),
                        update=(not options.no_update),
-                       threads=options.threads)
+                       threads=options.threads,
+                       gcc_version=options.gcc_version)
+
     print("created container " + container.cid)
     container.execute(
         "echo \"%s\" ~amd64 >> /etc/portage/package.accept_keywords" %
