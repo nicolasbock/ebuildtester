@@ -28,6 +28,7 @@ class Docker:
         variable specifies how many threads emerge should use.
         """
 
+        import re
         import subprocess
 
         docker_container = "gentoo/stage3-amd64-nomultilib"
@@ -72,8 +73,9 @@ class Docker:
             self.execute(("echo =sys-devel/gcc-%s ** >> " % gcc_version) +
                          "/etc/portage/package.accept_keywords")
             self.execute("emerge --verbose sys-devel/gcc")
+            gcc = re.sub("-r[0-9]+$", "", gcc_version)
             self.execute("gcc-config $(gcc-config --list-profiles | " +
-                         ("grep ${%s/%%-r*/} |" % gcc_version) +
+                         ("grep %s | " % gcc) +
                          "sed -e 's:^.*\[\([0-9]\+\)\].*:\\1:')")
             self.execute("emerge --oneshot sys-devel/libtool")
 
@@ -87,7 +89,7 @@ class Docker:
 
         global log
 
-        log.info("running \"%s\" in container" % (cmd))
+        log.info(cmd)
         docker_cmd = ["docker", "exec"]
         if interactive:
             docker_cmd += ["--tty", "--interactive"]
@@ -157,12 +159,16 @@ def main():
     global options
 
     log.setLevel(logging.DEBUG)
+
     ch = logging.StreamHandler()
     ch.setLevel(logging.INFO)
     ch.setFormatter(logging.Formatter("%(asctime)s - %(message)s"))
     log.addHandler(ch)
 
-    log.info("starting")
+    fh = logging.FileHandler("tester.log", "a")
+    fh.setLevel(logging.INFO)
+    fh.setFormatter(logging.Formatter("%(asctime)s - %(message)s"))
+    log.addHandler(fh)
 
     parse_commandline()
 
@@ -183,7 +189,7 @@ def main():
     container.execute("echo emerge --ask --verbose %s >> ~/.bash_history" %
                       (options.ATOM))
     try:
-        container.execute("emerge --ask --verbose %s" % (options.ATOM),
+        container.execute("emerge --verbose %s" % (options.ATOM),
                           interactive=True)
     except Exception:
         log.warn("ignoring failure of command")
