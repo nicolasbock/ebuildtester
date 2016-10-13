@@ -19,7 +19,7 @@ def massage_string(string):
 
 class Docker:
 
-    def __init__(self, local_portage, update=True, threads=1,
+    def __init__(self, local_portage, update=True, use=[], threads=1,
                  gcc_version=None):
         """Create a new container.
 
@@ -63,7 +63,14 @@ class Docker:
                      ">> /etc/portage/make.conf")
         self.execute(("echo MAKEOPTS=\\\"-j%d\\\" " % (threads)) +
                      ">> /etc/portage/make.conf")
-        self.execute("emerge --info")
+
+        self.execute(
+            "echo \"%s\" ~amd64 >> /etc/portage/package.accept_keywords" %
+            (options.ATOM))
+        if len(use) > 0:
+            self.execute("echo %s %s >> /etc/portage/package.use/testbuild" %
+                         (options.ATOM, " ".join(use)))
+
         # Update.
         if update:
             self.execute("emerge --update --deep --newuse @world")
@@ -78,6 +85,11 @@ class Docker:
                          ("grep %s | " % gcc) +
                          "sed -e 's:^.*\[\([0-9]\+\)\].*:\\1:')")
             self.execute("emerge --oneshot sys-devel/libtool")
+
+        self.execute("cat /etc/portage/package.accept_keywords")
+        self.execute("[[ -f /etc/portage/package.use/testbuild ]] " +
+                     "&& cat /etc/portage/package.use/testbuild")
+        self.execute("emerge --info")
 
     def execute(self, cmd, interactive=False):
         """Execute command in container.
@@ -142,6 +154,7 @@ def parse_commandline():
     parser.add_argument(
         "--use",
         help="The use flags for the ATOM",
+        default=[],
         nargs="+")
     parser.add_argument(
         "--gcc-version",
@@ -175,17 +188,10 @@ def main():
     log.info("creating container")
     container = Docker(os.path.abspath(options.portage_dir),
                        update=(not options.no_update),
-                       threads=options.threads,
+                       use=options.use, threads=options.threads,
                        gcc_version=options.gcc_version)
 
     log.info("created container " + container.cid)
-    container.execute(
-        "echo \"%s\" ~amd64 >> /etc/portage/package.accept_keywords" %
-        (options.ATOM))
-    container.execute("cat /etc/portage/package.accept_keywords")
-    if not (options.use is None) and len(options.use) > 0:
-        container.execute("echo %s %s >> /etc/portage/package.use/testbuild" %
-                          (options.ATOM, " ".join(options.use)))
     container.execute("echo emerge --ask --verbose %s >> ~/.bash_history" %
                       (options.ATOM))
     try:
