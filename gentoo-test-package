@@ -53,9 +53,7 @@ class Docker:
         if len(lines) > 1:
             raise Exception("more output than expected")
         self.cid = massage_string(lines[0]).strip()
-
-        # Update bash environment.
-        self.execute("echo HISTORY=1000 >> /root/.bashrc")
+        log.info("container id %s" % (self.cid))
 
         # Disable the usersandbox feature, it's not working well inside a
         # docker container.
@@ -75,6 +73,8 @@ class Docker:
         if update:
             self.execute("emerge --update --deep --newuse @world")
 
+        self.execute("emerge app-portage/gentoolkit")
+
         # Set gcc version.
         if gcc_version:
             self.execute(("echo =sys-devel/gcc-%s ** >> " % gcc_version) +
@@ -87,26 +87,54 @@ class Docker:
             self.execute("emerge --oneshot sys-devel/libtool")
 
         self.execute("cat /etc/portage/package.accept_keywords")
-        self.execute("[[ -f /etc/portage/package.use/testbuild ]] " +
-                     "&& cat /etc/portage/package.use/testbuild")
+        self.execute("if [[ -f /etc/portage/package.use/testbuild ]]; then " +
+                     "cat /etc/portage/package.use/testbuild; fi")
         self.execute("emerge --info")
 
-    def execute(self, cmd, interactive=False):
+    def reader(self, proc, stream, name):
+        """Read from a subprocess stream."""
+
+        global log
+        global log_ch
+
+        while True:
+            out = stream.readline()
+            if out == "" and proc.poll() is not None:
+                break
+            log.info("%s %s: %s" % (self.cid[:6], name, out.rstrip()))
+            log_ch.flush()
+
+    def execute(self, cmd):
         """Execute command in container.
 
         cmd is a string which is executed within a bash shell.
         """
 
+        import os
         import subprocess
+        import sys
 
         global log
 
-        log.info(cmd)
-        docker_cmd = ["docker", "exec"]
-        if interactive:
-            docker_cmd += ["--tty", "--interactive"]
-        docker_cmd += [self.cid, "/bin/bash", "-c", cmd]
-        docker = subprocess.Popen(docker_cmd)
+        log.info("%s %s" % (self.cid[:6], cmd))
+        docker_cmd = ["docker", "exec", "--interactive"]
+        docker_cmd += [self.cid, "/bin/bash"]
+        docker = subprocess.Popen(docker_cmd, stdout=subprocess.PIPE,
+                                  stderr=subprocess.PIPE,
+                                  stdin=subprocess.PIPE,
+                                  universal_newlines=True)
+        docker.stdin.write(cmd + "\n")
+        docker.stdin.close()
+        stdout_reader = os.fork()
+        if stdout_reader == 0:
+            self.reader(docker, docker.stdout, "stdout")
+            sys.exit(0)
+        stderr_reader = os.fork()
+        if stderr_reader == 0:
+            self.reader(docker, docker.stderr, "stderr")
+            sys.exit(0)
+        os.waitid(os.P_PID, stdout_reader, os.WEXITED)
+        os.waitid(os.P_PID, stderr_reader, os.WEXITED)
         docker.wait()
         if docker.returncode != 0:
             log.error("running in container %s" % (str(self.cid)))
@@ -136,6 +164,11 @@ def parse_commandline():
     parser.add_argument(
         "ATOM",
         help="The package atom to test")
+    parser.add_argument(
+        "--manual",
+        help="Install package manually",
+        default=False,
+        action="store_true")
     parser.add_argument(
         "--portage-dir",
         help="The local portage directory",
@@ -169,14 +202,15 @@ def main():
     import os.path
 
     global log
+    global log_ch
     global options
 
     log.setLevel(logging.DEBUG)
 
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.INFO)
-    ch.setFormatter(logging.Formatter("%(asctime)s - %(message)s"))
-    log.addHandler(ch)
+    log_ch = logging.StreamHandler()
+    log_ch.setLevel(logging.INFO)
+    log_ch.setFormatter(logging.Formatter("%(asctime)s - %(message)s"))
+    log.addHandler(log_ch)
 
     fh = logging.FileHandler("tester.log", "a")
     fh.setLevel(logging.INFO)
@@ -192,14 +226,23 @@ def main():
                        gcc_version=options.gcc_version)
 
     log.info("created container " + container.cid)
-    container.execute("echo emerge --ask --verbose %s >> ~/.bash_history" %
-                      (options.ATOM))
-    try:
-        container.execute("emerge --verbose %s" % (options.ATOM),
-                          interactive=True)
-    except Exception:
-        log.warn("ignoring failure of command")
-    container.shell()
+    if options.manual:
+        container.shell()
+    else:
+        container.execute("echo emerge --ask --autounmask-write --verbose " +
+                          options.ATOM +
+                          " >> ~/.bash_history")
+        try:
+            container.execute("emerge --autounmask-write --verbose " +
+                              options.ATOM)
+        except Exception:
+            log.warn("ignoring failure of command")
+        container.execute("etc-update --automode -5")
+        try:
+            container.execute("emerge --verbose " + options.ATOM)
+        except Exception:
+            log.warn("ignoring failure of command")
+        container.shell()
 
 if __name__ == "__main__":
     main()
