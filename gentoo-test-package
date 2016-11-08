@@ -4,6 +4,7 @@ import logging
 
 log = logging.getLogger("test-package")
 options = None
+basic_packages = ["app-portage/gentoolkit"]
 
 
 def massage_string(string):
@@ -19,77 +20,153 @@ def massage_string(string):
 
 class Docker:
 
-    def __init__(self, local_portage, update=True, use=[], threads=1,
-                 gcc_version=None):
-        """Create a new container.
+    def __init__(self, local_portage, overlay_dirs, update=True):
+        """Create a new container."""
 
-        local_portage is the path to the local portage repository. The
-        update argument specifies whether to update the container. The threads
-        variable specifies how many threads emerge should use.
-        """
+        import os.path
 
-        import re
+        docker_image = "gentoo/stage3-amd64-nomultilib"
+        overlay_dirs = list(set(overlay_dirs))
+        overlay_mountpoints = [os.path.join("/var/lib/overlays", p)
+                               for p in map(os.path.basename, overlay_dirs)]
+
+        self._create_container(docker_image, local_portage,
+                               zip(overlay_dirs, overlay_mountpoints))
+        self._start_container()
+        self._tweak_settings()
+        self._enable_overlays(map(os.path.basename, overlay_dirs))
+        self._unmask_atom()
+        self._update(update)
+        self._install_basics()
+        self._set_gcc()
+        self._print_summary()
+
+    def _enable_overlays(self, overlays):
+        """Enable overlays."""
+
+        self.execute("mkdir -p /etc/portage/repos.conf")
+        for o in overlays:
+            self.execute("echo \"[%s]\" >> "
+                         "/etc/portage/repos.conf/overlays.conf" % o)
+            self.execute("echo \"location = /var/lib/overlays/%s\" >> "
+                         "/etc/portage/repos.conf/overlays.conf" % o)
+            self.execute("echo \"master = gentoo\" >> "
+                         "/etc/portage/repos.conf/overlays.conf")
+
+    def _start_container(self):
+        """Start the container."""
+
         import subprocess
 
-        docker_container = "gentoo/stage3-amd64-nomultilib"
-        docker_args = ["docker", "pull", docker_container]
-        docker = subprocess.Popen(docker_args)
+        docker_args = ["docker", "start", "%s" % self.cid]
+        docker = subprocess.Popen(docker_args, stdout=subprocess.PIPE)
         docker.wait()
+        if docker.returncode != 0:
+            raise Exception("failure creating docker container")
+
+    def _create_container(self, docker_image, local_portage, overlays):
+        """Create new container."""
+
+        import subprocess
+
         docker_args = [
-            "docker", "run", "--detach", "--tty",
+            "docker", "create",
+            "--tty",
             "--cap-add", "SYS_ADMIN",
             "--device", "/dev/fuse",
             "--workdir", "/root",
             "--volume=%s:/usr/portage" % (local_portage),
-            "--volume=/usr/portage/distfiles:/usr/portage/distfiles",
-            docker_container]
+            "--volume=/usr/portage/distfiles:/usr/portage/distfiles"]
+        for o in overlays:
+            docker_args += ["--volume=%s:%s" % o]
+        docker_args += [docker_image]
         log.info("creating docker container with: %s" %
                  (" ".join(docker_args)))
         docker = subprocess.Popen(docker_args, stdout=subprocess.PIPE)
         docker.wait()
         if docker.returncode != 0:
             raise Exception("failure creating docker container")
+
         lines = docker.stdout.readlines()
         if len(lines) > 1:
             raise Exception("more output than expected")
         self.cid = massage_string(lines[0]).strip()
         log.info("container id %s" % (self.cid))
 
+    def _setup_container(self, docker_image):
+        """Setup the container."""
+
+        import subprocess
+
+        docker_args = ["docker", "pull", docker_image]
+        docker = subprocess.Popen(docker_args)
+        docker.wait()
+
+    def _update(self, update):
+        """Update container."""
+
+        log.info("updating container")
+        if update:
+            self.execute("emerge --update --deep --newuse @world")
+
+    def _print_summary(self):
+        """Print summary."""
+
+        log.info("summary")
+        self.execute("if [[ -f /etc/portage/accept_keywords ]]; then " +
+                     "cat /etc/portage/package.accept_keywords; fi")
+        self.execute("if [[ -f /etc/portage/package.use/testbuild ]]; then " +
+                     "cat /etc/portage/package.use/testbuild; fi")
+        self.execute("emerge --info")
+
+    def _unmask_atom(self):
+        """Unmask the atom to install."""
+
+        log.info("unmasking atom")
+        if options.atom is not None:
+            self.execute(
+                "echo \"%s\" ~amd64 >> /etc/portage/package.accept_keywords" %
+                (options.atom))
+            if len(options.use) > 0:
+                self.execute(
+                    "echo %s %s >> /etc/portage/package.use/testbuild" %
+                    (options.atom, " ".join(options.use)))
+
+    def _tweak_settings(self):
+        """Tweak portage settings."""
+
+        log.info("tweaking portage settings")
+
         # Disable the usersandbox feature, it's not working well inside a
         # docker container.
         self.execute("echo FEATURES=\\\"-sandbox -usersandbox\\\" " +
                      ">> /etc/portage/make.conf")
-        self.execute(("echo MAKEOPTS=\\\"-j%d\\\" " % (threads)) +
+        self.execute(("echo MAKEOPTS=\\\"-j%d\\\" " % (options.threads)) +
                      ">> /etc/portage/make.conf")
 
-        self.execute(
-            "echo \"%s\" ~amd64 >> /etc/portage/package.accept_keywords" %
-            (options.ATOM))
-        if len(use) > 0:
-            self.execute("echo %s %s >> /etc/portage/package.use/testbuild" %
-                         (options.ATOM, " ".join(use)))
+    def _install_basics(self):
+        """Install some basic packages."""
 
-        # Update.
-        if update:
-            self.execute("emerge --update --deep --newuse @world")
+        log.info("installing basic packages: " + ", ".join(basic_packages))
+        for p in basic_packages:
+            self.execute("emerge %s" % p)
 
-        self.execute("emerge app-portage/gentoolkit")
+    def _set_gcc(self):
+        """Set gcc in the container."""
 
-        # Set gcc version.
-        if gcc_version:
-            self.execute(("echo =sys-devel/gcc-%s ** >> " % gcc_version) +
-                         "/etc/portage/package.accept_keywords")
+        import re
+
+        log.info("setting gcc")
+        if options.gcc_version:
+            self.execute(
+                ("echo =sys-devel/gcc-%s ** >> " % options.gcc_version) +
+                "/etc/portage/package.accept_keywords")
             self.execute("emerge --verbose sys-devel/gcc")
-            gcc = re.sub("-r[0-9]+$", "", gcc_version)
+            gcc = re.sub("-r[0-9]+$", "", options.gcc_version)
             self.execute("gcc-config $(gcc-config --list-profiles | " +
                          ("grep %s | " % gcc) +
                          "sed -e 's:^.*\[\([0-9]\+\)\].*:\\1:')")
             self.execute("emerge --oneshot sys-devel/libtool")
-
-        self.execute("cat /etc/portage/package.accept_keywords")
-        self.execute("if [[ -f /etc/portage/package.use/testbuild ]]; then " +
-                     "cat /etc/portage/package.use/testbuild; fi")
-        self.execute("emerge --info")
 
     def reader(self, proc, stream, name):
         """Read from a subprocess stream."""
@@ -162,7 +239,7 @@ def parse_commandline():
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "ATOM",
+        "--atom",
         help="The package atom to test")
     parser.add_argument(
         "--manual",
@@ -174,8 +251,13 @@ def parse_commandline():
         help="The local portage directory",
         required=True)
     parser.add_argument(
+        "--overlay-dir",
+        help="Add overlay dir (can be used multiple times)",
+        action="append",
+        default=[])
+    parser.add_argument(
         "--no-update",
-        help="Do not update container before installing ATOM",
+        help="Do not update container before installing atom",
         default=False,
         action="store_true")
     parser.add_argument(
@@ -186,7 +268,7 @@ def parse_commandline():
         type=int)
     parser.add_argument(
         "--use",
-        help="The use flags for the ATOM",
+        help="The use flags for the atom",
         default=[],
         nargs="+")
     parser.add_argument(
@@ -194,6 +276,9 @@ def parse_commandline():
         metavar="VER",
         help="Use gcc version VER")
     options = parser.parse_args()
+
+    if not options.manual and options.atom is None:
+        raise Exception("either specify an atom or use --manual")
 
 
 def main():
@@ -221,25 +306,24 @@ def main():
 
     log.info("creating container")
     container = Docker(os.path.abspath(options.portage_dir),
-                       update=(not options.no_update),
-                       use=options.use, threads=options.threads,
-                       gcc_version=options.gcc_version)
+                       [os.path.abspath(p) for p in options.overlay_dir],
+                       update=(not options.no_update))
 
     log.info("created container " + container.cid)
     if options.manual:
         container.shell()
     else:
         container.execute("echo emerge --ask --autounmask-write --verbose " +
-                          options.ATOM +
+                          options.atom +
                           " >> ~/.bash_history")
         try:
             container.execute("emerge --autounmask-write --verbose " +
-                              options.ATOM)
+                              options.atom)
         except Exception:
             log.warn("ignoring failure of command")
         container.execute("etc-update --automode -5")
         try:
-            container.execute("emerge --verbose " + options.ATOM)
+            container.execute("emerge --verbose " + options.atom)
         except Exception:
             log.warn("ignoring failure of command")
         container.shell()
