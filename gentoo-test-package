@@ -20,7 +20,7 @@ def massage_string(string):
 
 class Docker:
 
-    def __init__(self, local_portage, overlay_dirs, update=True):
+    def __init__(self, local_portage, overlay_dirs):
         """Create a new container."""
 
         import os.path
@@ -36,7 +36,7 @@ class Docker:
         self._tweak_settings()
         self._enable_overlays(map(os.path.basename, overlay_dirs))
         self._unmask_atom()
-        self._update(update)
+        self._update()
         self._install_basics()
         self._set_gcc()
         self._print_summary()
@@ -164,12 +164,14 @@ class Docker:
         docker = subprocess.Popen(docker_args)
         docker.wait()
 
-    def _update(self, update):
+    def _update(self):
         """Update container."""
 
-        log.info("updating container")
-        if update:
-            self.execute("emerge --update --deep --newuse @world")
+        if options.no_update:
+            log.info("skipping update")
+        else:
+            log.info("updating container")
+            self.execute("emerge --verbose --update --deep --newuse @world")
 
     def _print_summary(self):
         """Print summary."""
@@ -211,7 +213,7 @@ class Docker:
 
         log.info("installing basic packages: " + ", ".join(basic_packages))
         for p in basic_packages:
-            self.execute("emerge %s" % p)
+            self.execute("emerge --verbose %s" % p)
 
     def _set_gcc(self):
         """Set gcc in the container."""
@@ -228,7 +230,7 @@ class Docker:
             self.execute("gcc-config $(gcc-config --list-profiles | " +
                          ("grep %s | " % gcc) +
                          "sed -e 's:^.*\[\([0-9]\+\)\].*:\\1:')")
-            self.execute("emerge --oneshot sys-devel/libtool")
+            self.execute("emerge --verbose --oneshot sys-devel/libtool")
 
 
 def parse_commandline():
@@ -307,8 +309,7 @@ def main():
 
     log.info("creating container")
     container = Docker(os.path.abspath(options.portage_dir),
-                       [os.path.abspath(p) for p in options.overlay_dir],
-                       update=(not options.no_update))
+                       [os.path.abspath(p) for p in options.overlay_dir])
 
     log.info("created container " + container.cid)
     if options.manual:
