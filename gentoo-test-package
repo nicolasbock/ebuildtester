@@ -36,6 +36,7 @@ class Docker:
         self._tweak_settings()
         self._enable_overlays(map(os.path.basename, overlay_dirs))
         self._unmask_atom()
+        self._unmask()
         self._update()
         self._install_basics()
         self._set_gcc()
@@ -190,11 +191,21 @@ class Docker:
         if options.atom is not None:
             self.execute(
                 "echo \"%s\" ~amd64 >> /etc/portage/package.accept_keywords" %
-                (options.atom))
+                options.atom)
             if len(options.use) > 0:
                 self.execute(
                     "echo %s %s >> /etc/portage/package.use/testbuild" %
                     (options.atom, " ".join(options.use)))
+
+    def _unmask(self):
+        """Unmask other atoms."""
+
+        log.info("unmasking additional atoms")
+        for a in options.unmask:
+            log.info("  unmasking %s" % a)
+            self.execute(
+                "echo \"%s\" ~amd64 >> /etc/portage/package.accept_keywords" %
+                a)
 
     def _tweak_settings(self):
         """Tweak portage settings."""
@@ -213,6 +224,7 @@ class Docker:
 
         log.info("installing basic packages: " + ", ".join(basic_packages))
         for p in basic_packages:
+            log.info("  installing %s" % p)
             self.execute("emerge --verbose %s" % p)
 
     def _set_gcc(self):
@@ -275,6 +287,12 @@ def parse_commandline():
         default=[],
         nargs="+")
     parser.add_argument(
+        "--unmask",
+        metavar="ATOM",
+        help="Unmask atom",
+        default=[],
+        action="append")
+    parser.add_argument(
         "--gcc-version",
         metavar="VER",
         help="Use gcc version VER")
@@ -315,11 +333,11 @@ def main():
     if options.manual:
         container.shell()
     else:
-        container.execute("echo emerge --ask --autounmask-write --verbose " +
+        container.execute("echo emerge --ask --autounmask-write=n --verbose " +
                           options.atom +
                           " >> ~/.bash_history")
         try:
-            container.execute("emerge --autounmask-write --verbose " +
+            container.execute("emerge --autounmask-write=n --verbose " +
                               options.atom)
         except Exception:
             log.warn("ignoring failure of command")
