@@ -25,11 +25,12 @@ class Docker:
 
         import os.path
 
-        docker_image = "gentoo/stage3-amd64-nomultilib"
+        docker_image = "gentoo/stage3-amd64"
         overlay_dirs = list(set(overlay_dirs))
         overlay_mountpoints = [os.path.join("/var/lib/overlays", p)
                                for p in map(os.path.basename, overlay_dirs)]
 
+        self._setup_container(docker_image)
         self._create_container(docker_image, local_portage,
                                zip(overlay_dirs, overlay_mountpoints))
         self._start_container()
@@ -326,7 +327,7 @@ def main():
     parse_commandline()
 
     log.info("creating container")
-    container = Docker(os.path.abspath(options.portage_dir),
+    container = Docker(os.path.abspath(os.path.expanduser(options.portage_dir)),
                        [os.path.abspath(p) for p in options.overlay_dir])
 
     log.info("created container " + container.cid)
