@@ -105,28 +105,14 @@ class Docker:
             log.info("%s (%s): %s" % (self.cid[:6], name, out.rstrip()))
             log_ch.flush()
 
-    def _enable_overlays(self, overlays):
-        """Enable overlays."""
-
-        self.execute("mkdir -p /etc/portage/repos.conf")
-        for o in overlays:
-            self.execute("echo \"[%s]\" >> "
-                         "/etc/portage/repos.conf/overlays.conf" % o)
-            self.execute("echo \"location = /var/lib/overlays/%s\" >> "
-                         "/etc/portage/repos.conf/overlays.conf" % o)
-            self.execute("echo \"master = gentoo\" >> "
-                         "/etc/portage/repos.conf/overlays.conf")
-
-    def _start_container(self):
-        """Start the container."""
+    def _setup_container(self, docker_image):
+        """Setup the container."""
 
         import subprocess
 
-        docker_args = ["docker", "start", "%s" % self.cid]
-        docker = subprocess.Popen(docker_args, stdout=subprocess.PIPE)
+        docker_args = ["docker", "pull", docker_image]
+        docker = subprocess.Popen(docker_args)
         docker.wait()
-        if docker.returncode != 0:
-            raise Exception("failure creating docker container")
 
     def _create_container(self, docker_image, local_portage, overlays):
         """Create new container."""
@@ -138,6 +124,7 @@ class Docker:
             "--tty",
             "--cap-add", "SYS_ADMIN",
             "--device", "/dev/fuse",
+            "--storage-opt", "size=50G",
             "--workdir", "/root",
             "--volume=%s:/usr/portage" % (local_portage),
             "--volume=/usr/portage/distfiles:/usr/portage/distfiles"]
@@ -157,33 +144,40 @@ class Docker:
         self.cid = massage_string(lines[0]).strip()
         log.info("container id %s" % (self.cid))
 
-    def _setup_container(self, docker_image):
-        """Setup the container."""
+    def _start_container(self):
+        """Start the container."""
 
         import subprocess
 
-        docker_args = ["docker", "pull", docker_image]
-        docker = subprocess.Popen(docker_args)
+        docker_args = ["docker", "start", "%s" % self.cid]
+        docker = subprocess.Popen(docker_args, stdout=subprocess.PIPE)
         docker.wait()
+        if docker.returncode != 0:
+            raise Exception("failure creating docker container")
 
-    def _update(self):
-        """Update container."""
+    def _tweak_settings(self):
+        """Tweak portage settings."""
 
-        if options.no_update:
-            log.info("skipping update")
-        else:
-            log.info("updating container")
-            self.execute("emerge --verbose --update --deep --newuse @world")
+        log.info("tweaking portage settings")
 
-    def _print_summary(self):
-        """Print summary."""
+        # Disable the usersandbox feature, it's not working well inside a
+        # docker container.
+        self.execute("echo FEATURES=\\\"-sandbox -usersandbox\\\" " +
+                     ">> /etc/portage/make.conf")
+        self.execute(("echo MAKEOPTS=\\\"-j%d\\\" " % (options.threads)) +
+                     ">> /etc/portage/make.conf")
 
-        log.info("summary")
-        self.execute("if [[ -f /etc/portage/accept_keywords ]]; then " +
-                     "cat /etc/portage/package.accept_keywords; fi")
-        self.execute("if [[ -f /etc/portage/package.use/testbuild ]]; then " +
-                     "cat /etc/portage/package.use/testbuild; fi")
-        self.execute("emerge --info")
+    def _enable_overlays(self, overlays):
+        """Enable overlays."""
+
+        self.execute("mkdir -p /etc/portage/repos.conf")
+        for o in overlays:
+            self.execute("echo \"[%s]\" >> "
+                         "/etc/portage/repos.conf/overlays.conf" % o)
+            self.execute("echo \"location = /var/lib/overlays/%s\" >> "
+                         "/etc/portage/repos.conf/overlays.conf" % o)
+            self.execute("echo \"master = gentoo\" >> "
+                         "/etc/portage/repos.conf/overlays.conf")
 
     def _unmask_atom(self):
         """Unmask the atom to install."""
@@ -208,17 +202,14 @@ class Docker:
                 "echo \"%s\" ~amd64 >> /etc/portage/package.accept_keywords" %
                 a)
 
-    def _tweak_settings(self):
-        """Tweak portage settings."""
+    def _update(self):
+        """Update container."""
 
-        log.info("tweaking portage settings")
-
-        # Disable the usersandbox feature, it's not working well inside a
-        # docker container.
-        self.execute("echo FEATURES=\\\"-sandbox -usersandbox\\\" " +
-                     ">> /etc/portage/make.conf")
-        self.execute(("echo MAKEOPTS=\\\"-j%d\\\" " % (options.threads)) +
-                     ">> /etc/portage/make.conf")
+        if not options.update:
+            log.info("skipping update")
+        else:
+            log.info("updating container")
+            self.execute("emerge --verbose --update --deep --newuse @world")
 
     def _install_basics(self):
         """Install some basic packages."""
@@ -244,6 +235,16 @@ class Docker:
                          ("grep %s | " % gcc) +
                          "sed -e 's:^.*\[\([0-9]\+\)\].*:\\1:')")
             self.execute("emerge --verbose --oneshot sys-devel/libtool")
+
+    def _print_summary(self):
+        """Print summary."""
+
+        log.info("summary")
+        self.execute("if [[ -f /etc/portage/accept_keywords ]]; then " +
+                     "cat /etc/portage/package.accept_keywords; fi")
+        self.execute("if [[ -f /etc/portage/package.use/testbuild ]]; then " +
+                     "cat /etc/portage/package.use/testbuild; fi")
+        self.execute("emerge --info")
 
 
 def parse_commandline():
@@ -272,8 +273,8 @@ def parse_commandline():
         action="append",
         default=[])
     parser.add_argument(
-        "--no-update",
-        help="Do not update container before installing atom",
+        "--update",
+        help="Update container before installing atom",
         default=False,
         action="store_true")
     parser.add_argument(
