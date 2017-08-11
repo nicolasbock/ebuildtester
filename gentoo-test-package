@@ -126,13 +126,13 @@ class Docker:
             "--device", "/dev/fuse",
             "--storage-opt", "size=50G",
             "--workdir", "/root",
-            "--volume=%s:/usr/portage" % (local_portage),
-            "--volume=/usr/portage/distfiles:/usr/portage/distfiles"]
+            "--volume", "%s:/usr/portage" % local_portage,
+            "--volume", "/usr/portage/distfiles:/usr/portage/distfiles"]
         for o in overlays:
             docker_args += ["--volume=%s:%s" % o]
         docker_args += [docker_image]
         log.info("creating docker container with: %s" %
-                 (" ".join(docker_args)))
+                 " ".join(docker_args))
         docker = subprocess.Popen(docker_args, stdout=subprocess.PIPE)
         docker.wait()
         if docker.returncode != 0:
@@ -328,8 +328,9 @@ def main():
     parse_commandline()
 
     log.info("creating container")
-    container = Docker(os.path.abspath(os.path.expanduser(options.portage_dir)),
-                       [os.path.abspath(p) for p in options.overlay_dir])
+    container = Docker(
+        os.path.abspath(os.path.expanduser(options.portage_dir)),
+        [os.path.abspath(p) for p in options.overlay_dir])
 
     log.info("created container " + container.cid)
     if options.manual:
