@@ -184,13 +184,15 @@ class Docker:
 
         log.info("unmasking atom")
         if options.atom is not None:
-            self.execute(
-                "echo \"%s\" ~amd64 >> /etc/portage/package.accept_keywords" %
-                options.atom)
-            if len(options.use) > 0:
+            for a in options.atom:
                 self.execute(
-                    "echo %s %s >> /etc/portage/package.use/testbuild" %
-                    (options.atom, " ".join(options.use)))
+                    "echo \"" + a + "\" ~amd64 >> " +
+                    "/etc/portage/package.accept_keywords")
+            if len(options.use) > 0:
+                for a in options.atom:
+                    self.execute(
+                        "echo %s %s >> /etc/portage/package.use/testbuild" %
+                        (a, " ".join(options.use)))
 
     def _unmask(self):
         """Unmask other atoms."""
@@ -257,7 +259,9 @@ def parse_commandline():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--atom",
-        help="The package atom to test")
+        help="The package atom(s) to install",
+        nargs="+",
+        action="append")
     parser.add_argument(
         "--manual",
         help="Install package manually",
@@ -291,7 +295,7 @@ def parse_commandline():
     parser.add_argument(
         "--unmask",
         metavar="ATOM",
-        help="Unmask atom",
+        help="Unmask atom (can be used multiple times)",
         default=[],
         action="append")
     parser.add_argument(
@@ -302,6 +306,12 @@ def parse_commandline():
 
     if not options.manual and options.atom is None:
         raise Exception("either specify an atom or use --manual")
+
+    if options.atom:
+        temp = []
+        for a in options.atom:
+            temp += a
+        options.atom = temp
 
 
 def main():
@@ -337,16 +347,16 @@ def main():
         container.shell()
     else:
         container.execute("echo emerge --ask --autounmask-write=n --verbose " +
-                          options.atom +
+                          " ".join(options.atom) +
                           " >> ~/.bash_history")
         try:
             container.execute("emerge --autounmask-write=n --verbose " +
-                              options.atom)
+                              " ".join(options.atom))
         except Exception:
             log.warn("ignoring failure of command")
         container.execute("etc-update --automode -5")
         try:
-            container.execute("emerge --verbose " + options.atom)
+            container.execute("emerge --verbose " + " ".join(options.atom))
         except Exception:
             log.warn("ignoring failure of command")
         container.shell()
