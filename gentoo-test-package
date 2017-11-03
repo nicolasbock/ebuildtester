@@ -89,7 +89,7 @@ class Docker:
 
         log.info("running interactive shell in container")
         docker = subprocess.Popen(["docker", "exec", "--tty", "--interactive",
-                                  self.cid, "/bin/bash"])
+                                   self.cid, "/bin/bash"])
         docker.wait()
 
     def _reader(self, proc, stream, name):
@@ -302,6 +302,11 @@ def parse_commandline():
         "--gcc-version",
         metavar="VER",
         help="Use gcc version VER")
+    parser.add_argument(
+        "--with-X",
+        help="Install VNC server to test graphical applications",
+        default=False,
+        action="store_true")
     options = parser.parse_args()
 
     if not options.manual and options.atom is None:
@@ -312,6 +317,11 @@ def parse_commandline():
         for a in options.atom:
             temp += a
         options.atom = temp
+    else:
+        options.atom = []
+
+    if options.with_X:
+        options.atom += ["net-misc/tigervnc", "x11-wm/icewm"]
 
 
 def main():
@@ -360,6 +370,7 @@ def main():
         except Exception:
             log.warn("ignoring failure of command")
         container.shell()
+
 
 if __name__ == "__main__":
     main()
