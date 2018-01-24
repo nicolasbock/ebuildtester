@@ -1,8 +1,12 @@
-import setuptools
+#!/usr/bin/env python
 
-setuptools.setup(
+from setuptools import setup, find_packages
+
+setup(
+    name="ebuildtester",
     version="0.1.0",
+    packages=find_packages(),
     entry_points={
-        "console_scripts": ["gentoo-test-package.main"]
+        "console_scripts": ["ebuildtester = ebuildtester.main:main"]
     }
 )
