@@ -18,6 +18,7 @@ class Docker:
         self._create_container(docker_image, local_portage,
                                zip(overlay_dirs, overlay_mountpoints))
         self._start_container()
+        self._set_profile()
         self._tweak_settings()
         self._enable_overlays(map(os.path.basename, overlay_dirs))
         self._unmask_atom()
@@ -132,6 +133,12 @@ class Docker:
         docker.wait()
         if docker.returncode != 0:
             raise Exception("failure creating docker container")
+
+    def _set_profile(self):
+        """Set the Gentoo profile."""
+
+        log.info("setting Gentoo profile to %s" % default_profile)
+        self.execute("eselect profile set %s" % default_profile)
 
     def _tweak_settings(self):
         """Tweak portage settings."""
