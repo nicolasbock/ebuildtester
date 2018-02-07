@@ -12,4 +12,4 @@ install:
 
 script:
   - pytest
-  # - ./setup.py test
+  - ./setup.py test
