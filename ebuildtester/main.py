@@ -3,6 +3,7 @@ from ebuildtester.docker import Docker
 from ebuildtester.parse import parse_commandline
 import ebuildtester.options as options
 import os.path
+import sys
 
 
 def main():
@@ -12,7 +13,7 @@ def main():
 
     options.log.setLevel(logging.DEBUG)
 
-    parse_commandline()
+    options.options = parse_commandline(sys.argv[1:])
 
     options.log.info("creating container")
     container = Docker(

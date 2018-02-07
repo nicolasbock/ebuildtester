@@ -1,8 +1,7 @@
-import ebuildtester.options as options
 import argparse
 
 
-def parse_commandline():
+def parse_commandline(args):
     """Parse the command line."""
 
     parser = argparse.ArgumentParser()
@@ -56,18 +55,20 @@ def parse_commandline():
         help="Install VNC server to test graphical applications",
         default=False,
         action="store_true")
-    options.options = parser.parse_args()
+    options = parser.parse_args(args)
 
-    if not options.options.manual and options.options.atom is None:
+    if not options.manual and options.atom is None:
         raise Exception("either specify an atom or use --manual")
 
-    if options.options.atom:
+    if options.atom:
         temp = []
-        for a in options.options.atom:
+        for a in options.atom:
             temp += a
-        options.options.atom = temp
+        options.atom = temp
     else:
-        options.options.atom = []
+        options.atom = []
 
-    if options.options.with_X:
-        options.options.atom += ["net-misc/tigervnc", "x11-wm/icewm"]
+    if options.with_X:
+        options.atom += ["net-misc/tigervnc", "x11-wm/icewm"]
+
+    return options
