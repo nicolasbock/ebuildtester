@@ -10,5 +10,10 @@ Usage
 =====
 
 ```bash
-ebuildtester --portage-dir /usr/portage --overlay-dir /usr/local/portage --use R boost imaging python qt5 rendering views --unmask =sci-libs/vtk-8.0.1 --with-X --atom =sci-libs/vtk-8.0.1
+ebuildtester --portage-dir /usr/portage \
+    --overlay-dir /usr/local/portage \
+    --use R boost imaging python qt5 rendering views \
+    --unmask =sci-libs/vtk-8.0.1 \
+    --with-X \
+    --atom =sci-libs/vtk-8.0.1
 ```
