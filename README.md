@@ -6,6 +6,8 @@
 
 A dockerized approach to test a Gentoo package within a clean stage3.
 
+Detailed documentation can be found at http://ebuildtester.readthedocs.io/.
+
 Usage
 =====
 
