@@ -3,15 +3,6 @@
    :caption: Contents:
 
 
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
-
 Introduction
 ============
 
@@ -29,12 +20,19 @@ We are going to assume that the user has a local git clone of the portage tree i
 
    /usr/local/git/gentoo
 
-Then a particular ebuild (ATOM) can be tested with:
+We have added a new ebuild and would like to verify that the build
+dependencies are all correct. We can build the package (ATOM) with:
 
 .. code-block:: python
 
    ebuildtester --portage-dir /usr/local/git/gentoo \
-     --atom ATOM
+     --atom ATOM \
+     --use USE1 USE2
+
+where we have specified two USE flags, USE1 and USE2. The
+`ebuildtester` command will now create a docker container and start
+installing the ATOM. All specified dependencies will be installed as
+well.
 
 
 Command line arguments
