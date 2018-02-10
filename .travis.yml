@@ -10,5 +10,5 @@ install:
   - pip install -r requirements.txt
 
 script:
-  - python -m sphinx -M html docs _build
+  - sphinx-build -M doctest docs docs/_build
   - python -m unittest
