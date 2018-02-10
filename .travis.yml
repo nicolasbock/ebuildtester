@@ -11,4 +11,6 @@ install:
 
 script:
   - sphinx-build -M doctest docs docs/_build
+  - sphinx-build -M linkcheck docs docs/_build
+  - sphinx-build -M coverage docs docs/_build
   - python -m unittest
