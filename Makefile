@@ -8,6 +8,7 @@ dist: distclean
 	python setup.py bdist_wheel --universal
 
 docs:
+	sphinx-apidoc --force --output-dir docs ebuildtester
 	$(MAKE) -C docs
 
 distclean:
