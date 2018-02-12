@@ -49,6 +49,15 @@ installing the ATOM. All specified dependencies will be installed as
 well.
 
 
+Demo
+----
+
+To make the above more concrete, let us demonstrate how to test an
+ebuild from an overly.
+
+.. image:: demo.gif
+
+
 Command line arguments
 ----------------------
 
@@ -85,6 +94,7 @@ The command understands the following command line arguments:
      --with-X              Install VNC server to test graphical applications
      --profile {default/linux/amd64/17.0,default/linux/amd64/17.0/systemd}
                            The profile to use
+
 
 Mailing List
 ============
