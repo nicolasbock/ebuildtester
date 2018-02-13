@@ -9,7 +9,7 @@ def init():
     global options
 
     default_profile = "default/linux/amd64/17.0"
-    basic_packages = ["app-portage/gentoolkit"]
+    basic_packages = ["app-portage/gentoolkit", "app-portage/flaggie"]
     options = None
     log = logging.getLogger("test-package")
     log_ch = logging.StreamHandler()
