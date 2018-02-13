@@ -21,8 +21,8 @@ current) stage3 Docker container.
    :alt: Documentation Status
 
 .. image:: https://badge.waffle.io/nicolasbock/ebuildtester.svg?columns=all
- :target: https://waffle.io/nicolasbock/ebuildtester
- :alt: 'Waffle.io - Columns and their card count'
+   :target: https://waffle.io/nicolasbock/ebuildtester
+   :alt: 'Waffle.io - Columns and their card count'
 
 
 Usage
