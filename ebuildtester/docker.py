@@ -21,6 +21,7 @@ class Docker:
         self._set_profile()
         self._tweak_settings()
         self._enable_overlays(map(os.path.basename, overlay_dirs))
+        self._enable_test()
         self._unmask_atom()
         self._unmask()
         self._update()
@@ -164,6 +165,11 @@ class Docker:
                          "/etc/portage/repos.conf/overlays.conf" % o)
             self.execute("echo \"master = gentoo\" >> "
                          "/etc/portage/repos.conf/overlays.conf")
+
+    def _enable_test(self):
+        """Enable test FEATURES for ATOM."""
+
+        options.log.info("enabling test feature for %s" % options.options.atom)
 
     def _unmask_atom(self):
         """Unmask the atom to install."""
