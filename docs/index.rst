@@ -16,6 +16,10 @@ current) stage3 Docker container.
 .. image:: https://badge.fury.io/py/ebuildtester.svg
     :target: https://badge.fury.io/py/ebuildtester
 
+.. image:: https://readthedocs.org/projects/ebuildtester/badge/?version=latest
+   :target: http://ebuildtester.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status
+
 .. image:: https://badge.waffle.io/nicolasbock/ebuildtester.svg?columns=all
  :target: https://waffle.io/nicolasbock/ebuildtester
  :alt: 'Waffle.io - Columns and their card count'
