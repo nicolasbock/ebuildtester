@@ -10,9 +10,19 @@ This script is a tool to test a Gentoo ebuild and its
 dependencies. The idea is that the package is emerged in a clean (and
 current) stage3 Docker container.
 
+.. image:: https://travis-ci.org/nicolasbock/ebuildtester.svg?branch=master
+    :target: https://travis-ci.org/nicolasbock/ebuildtester
+
+.. image:: https://badge.fury.io/py/ebuildtester.svg
+    :target: https://badge.fury.io/py/ebuildtester
+
+.. image:: https://readthedocs.org/projects/ebuildtester/badge/?version=latest
+   :target: http://ebuildtester.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status
+
 .. image:: https://badge.waffle.io/nicolasbock/ebuildtester.svg?columns=all
- :target: https://waffle.io/nicolasbock/ebuildtester
- :alt: 'Waffle.io - Columns and their card count'
+   :target: https://waffle.io/nicolasbock/ebuildtester
+   :alt: 'Waffle.io - Columns and their card count'
 
 
 Usage
