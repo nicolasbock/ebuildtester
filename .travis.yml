@@ -17,3 +17,14 @@ script:
   - sphinx-build -M doctest docs docs/_build
   - sphinx-build -M linkcheck docs docs/_build
   - sphinx-build -M coverage docs docs/_build
+
+deploy:
+  provider: pypi
+  user: nicolasbock
+  password:
+    secure: G9YozcC1lGoG1s2tndAUHpxH917vFkOP8BXEFSW4G1tLwmo09QcTIxmaYkqWxBHGwRJbA+68X6jvQPEluKEVD9wqJPBeFdUF9zjfl6zPdLZTRkPDucb1YLAvwCVZBgNlXjFGkp7qkVI0EDplrMVdtFR6V/xf4pt75fl9Qg/gQrKYKTWPJTKXK0YQQBwFoTERTFQNuTwjm9lb0aZ4/frn0QSWKxnUhT55oOE1yr4e+8pUFNUkQIydn29EtUo8us197Q7xtHGlF3kiMwebJ8ioh7LOg7n6pgLGq9oIJNRg5BlTcOPTffBvAHjsoDiQ+N+5Z6dbQgtAyIbEC3nk8Wvh+BjJ0xpyD65yH7n9dQsAX8HbmV2acgaWUrh0cgwvNjuMz6dZlK9LypHQbhY4Ewf9u0leF4WGlAR2IKhZ4aLYre/mzgDeGEd2IuIx3RUM+VtIscU36skYOn2k2XN83+4M1ITTr9sFvIr2S5LowPz2C1eTYI6Uf8kUSe8deZWc8ZT2uq3kQ8oWQWUfTFI3JG1cmNM/40OtT7WBTWUl7daV+xrdEtYVL68pAFjXTxrMAv33kBpj2MLbH1AAe9lECuu42IhTEf7lPeJ8qP/Q/P1ij+C8BIIN8yv0B4GeC+HrfMTXwB7WRGejvTIHDMBkqnTlJ5A7uwdtFdEd5BWP26jjZiU=
+  distributions: "sdist bdist_wheel"
+  on:
+    tags: true
+    branch: master
+
