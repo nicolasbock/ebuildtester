@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="ebuildtester",
-    version="0.1.4",
+    version="0.1.5",
     packages=["ebuildtester"],
     entry_points={
         "console_scripts": ["ebuildtester = ebuildtester.main:main"]
