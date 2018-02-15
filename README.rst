@@ -32,7 +32,7 @@ We are going to assume that the user has a local git clone of the portage tree i
 We have added a new ebuild and would like to verify that the build
 dependencies are all correct. We can build the package (ATOM) with:
 
-.. code-block:: python
+.. code-block:: bash
 
    ebuildtester --portage-dir /usr/local/git/gentoo \
      --atom ATOM \
@@ -49,7 +49,7 @@ Command line arguments
 
 The command understands the following command line arguments:
 
-.. code-block:: sh
+.. code-block:: bash
 
    usage: ebuildtester [-h] [--atom ATOM [ATOM ...]] [--manual] --portage-dir
                        PORTAGE_DIR [--overlay-dir OVERLAY_DIR] [--update]
