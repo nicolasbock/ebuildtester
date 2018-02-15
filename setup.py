@@ -4,8 +4,9 @@ from setuptools import setup, find_packages
 
 setup(
     name="ebuildtester",
-    version="0.1.5",
     packages=["ebuildtester"],
+    use_scm_version=True,
+    setup_requires=['setuptools_scm'],
     entry_points={
         "console_scripts": ["ebuildtester = ebuildtester.main:main"]
     },
