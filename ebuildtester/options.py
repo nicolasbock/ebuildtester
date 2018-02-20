@@ -2,14 +2,15 @@ import logging
 
 
 def init():
-    global basic_packages
+    global base_packages
     global default_profile
     global log
     global log_ch
     global options
 
     default_profile = "default/linux/amd64/17.0"
-    basic_packages = ["app-portage/gentoolkit", "app-portage/flaggie"]
+    base_packages = ["app-portage/gentoolkit",
+                     "app-portage/flaggie", "app-portage/eix"]
     options = None
     log = logging.getLogger("test-package")
     log_ch = logging.StreamHandler()
