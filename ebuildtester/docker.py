@@ -203,8 +203,8 @@ class Docker:
         """Install some basic packages."""
 
         options.log.info("installing basic packages: " +
-                         ", ".join(options.basic_packages))
-        for p in options.basic_packages:
+                         ", ".join(options.base_packages))
+        for p in options.base_packages:
             options.log.info("  installing %s" % p)
             self.execute("emerge --verbose %s" % p)
 
