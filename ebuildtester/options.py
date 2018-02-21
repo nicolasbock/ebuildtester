@@ -3,12 +3,10 @@ import logging
 
 def init():
     global base_packages
-    global default_profile
     global log
     global log_ch
     global options
 
-    default_profile = "default/linux/amd64/17.0"
     base_packages = ["app-portage/gentoolkit",
                      "app-portage/flaggie", "app-portage/eix"]
     options = None
