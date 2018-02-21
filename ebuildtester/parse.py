@@ -27,8 +27,8 @@ def parse_commandline(args):
     parser.add_argument(
         "--update",
         help="Update container before installing atom",
-        default=False,
-        action="store_true")
+        choices=["yes", "true", "no", "false"],
+        default="true")
     parser.add_argument(
         "--threads",
         metavar="N",
@@ -77,5 +77,10 @@ def parse_commandline(args):
 
     if options.with_X:
         options.atom += ["net-misc/tigervnc", "x11-wm/icewm"]
+
+    if options.update in ["yes", "true"]:
+        options.update = True
+    else:
+        options.update = False
 
     return options
