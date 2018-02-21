@@ -55,6 +55,13 @@ def parse_commandline(args):
         help="Install VNC server to test graphical applications",
         default=False,
         action="store_true")
+    parser.add_argument(
+        "--profile",
+        help="The profile to use",
+        choices=["default/linux/amd64/17.0",
+                 "default/linux/amd64/17.0/systemd"],
+        default="default/linux/amd64/17.0")
+
     options = parser.parse_args(args)
 
     if not options.manual and options.atom is None:

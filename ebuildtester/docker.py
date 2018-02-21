@@ -138,8 +138,8 @@ class Docker:
         """Set the Gentoo profile."""
 
         options.log.info("setting Gentoo profile to %s" %
-                         options.default_profile)
-        self.execute("eselect profile set %s" % options.default_profile)
+                         options.options.profile)
+        self.execute("eselect profile set %s" % options.options.profile)
 
     def _tweak_settings(self):
         """Tweak portage settings."""
