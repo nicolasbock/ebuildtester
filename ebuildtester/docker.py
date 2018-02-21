@@ -234,3 +234,4 @@ class Docker:
         self.execute("if [[ -f /etc/portage/package.use/testbuild ]]; then " +
                      "cat /etc/portage/package.use/testbuild; fi")
         self.execute("emerge --info")
+        self.execute("qlop --list")
