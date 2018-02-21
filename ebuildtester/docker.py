@@ -204,9 +204,7 @@ class Docker:
 
         options.log.info("installing basic packages: " +
                          ", ".join(options.base_packages))
-        for p in options.base_packages:
-            options.log.info("  installing %s" % p)
-            self.execute("emerge --verbose %s" % p)
+        self.execute("emerge --verbose %s" % " ".join(options.base_packages))
 
     def _set_gcc(self):
         """Set gcc in the container."""
