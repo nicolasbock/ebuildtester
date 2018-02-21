@@ -197,7 +197,9 @@ class Docker:
             options.log.info("skipping update")
         else:
             options.log.info("updating container")
-            self.execute("emerge --verbose --update --deep --newuse @world")
+            update_options = ["--verbose", "--update",
+                              "--deep", "--newuse", "--changed-deps"]
+            self.execute("emerge " + " ".join(update_options) + " @world")
 
     def _install_basics(self):
         """Install some basic packages."""
