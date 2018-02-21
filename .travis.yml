@@ -18,6 +18,7 @@ script:
   - sphinx-build -M doctest docs docs/_build
   - sphinx-build -M linkcheck docs docs/_build
   - sphinx-build -M coverage docs docs/_build
+  - python setup.py build_sphinx -b html,man
 
 deploy:
   provider: pypi
