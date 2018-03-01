@@ -21,7 +21,7 @@ class TestParse(unittest.TestCase):
 
     def test_atom(self):
         options = ebuildtester.parse.parse_commandline(
-            self.args + ["--atom", "ATOM"])
+            self.args + ["--atom", "=SECTION/ATOM-1"])
         self.assertTrue("ATOM" in options.atom)
 
     def test_manual(self):
