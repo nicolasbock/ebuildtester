@@ -38,7 +38,7 @@ def parse_commandline(args):
         "--update",
         help="Update container before installing atom",
         choices=["yes", "true", "no", "false"],
-        default="true")
+        default="false")
     parser.add_argument(
         "--threads",
         metavar="N",
