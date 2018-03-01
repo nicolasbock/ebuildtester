@@ -1,6 +1,6 @@
+from ebuildtester.atom import Atom
 from pkg_resources import get_distribution
 import argparse
-import ebuildtester.atom
 
 
 def parse_commandline(args):
@@ -87,7 +87,7 @@ def parse_commandline(args):
     if options.with_X:
         options.atom += ["net-misc/tigervnc", "x11-wm/icewm"]
 
-    options.atom = map(ebuildtester.atom.Atom, options.atom)
+    options.atom = map(Atom, options.atom)
 
     if options.update in ["yes", "true"]:
         options.update = True
