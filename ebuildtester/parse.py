@@ -1,10 +1,18 @@
+from pkg_resources import get_distribution
 import argparse
 
 
 def parse_commandline(args):
     """Parse the command line."""
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description="A dockerized approach to test a Gentoo "
+        "package within a clean stage3. This is version " +
+        get_distribution("ebuildtester").version)
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=get_distribution("ebuildtester").version)
     parser.add_argument(
         "--atom",
         help="The package atom(s) to install",
