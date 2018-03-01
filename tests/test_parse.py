@@ -1,5 +1,6 @@
-import unittest
+from ebuildtester.atom import Atom
 import ebuildtester.parse
+import unittest
 
 
 class TestParse(unittest.TestCase):
@@ -21,8 +22,8 @@ class TestParse(unittest.TestCase):
 
     def test_atom(self):
         options = ebuildtester.parse.parse_commandline(
-            self.args + ["--atom", "ATOM"])
-        self.assertTrue("ATOM" in options.atom)
+            self.args + ["--atom", "=SECTION/ATOM-1.0.0"])
+        self.assertTrue(Atom("=SECTION/ATOM-1.0.0") in options.atom)
 
     def test_manual(self):
         options = ebuildtester.parse.parse_commandline(
@@ -65,5 +66,5 @@ class TestParse(unittest.TestCase):
         options = ebuildtester.parse.parse_commandline(
             self.args + ["--with-X"])
         self.assertTrue(options.with_X)
-        self.assertTrue("net-misc/tigervnc" in options.atom)
-        self.assertTrue("x11-wm/icewm" in options.atom)
+        self.assertTrue(Atom("net-misc/tigervnc") in options.atom)
+        self.assertTrue(Atom("x11-wm/icewm") in options.atom)

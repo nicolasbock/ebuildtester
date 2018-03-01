@@ -25,7 +25,7 @@ def main():
         container.shell()
     else:
         container.execute("echo emerge --ask --autounmask-write=n --verbose " +
-                          " ".join(options.options.atom) +
+                          " ".join(map(str, options.options.atom)) +
                           " >> ~/.bash_history")
         try:
             container.execute("emerge --autounmask-write=n --verbose " +

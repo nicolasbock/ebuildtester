@@ -1,10 +1,20 @@
+from ebuildtester.atom import Atom
+from pkg_resources import get_distribution
 import argparse
+import multiprocessing
 
 
 def parse_commandline(args):
     """Parse the command line."""
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description="A dockerized approach to test a Gentoo "
+        "package within a clean stage3. This is version " +
+        get_distribution("ebuildtester").version)
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=get_distribution("ebuildtester").version)
     parser.add_argument(
         "--atom",
         help="The package atom(s) to install",
@@ -28,12 +38,12 @@ def parse_commandline(args):
         "--update",
         help="Update container before installing atom",
         choices=["yes", "true", "no", "false"],
-        default="true")
+        default="false")
     parser.add_argument(
         "--threads",
         metavar="N",
-        help="Use N threads to build packages",
-        default=1,
+        help="Use N (default %(default)s) threads to build packages",
+        default=multiprocessing.cpu_count(),
         type=int)
     parser.add_argument(
         "--use",
@@ -77,6 +87,8 @@ def parse_commandline(args):
 
     if options.with_X:
         options.atom += ["net-misc/tigervnc", "x11-wm/icewm"]
+
+    options.atom = list(map(Atom, options.atom))
 
     if options.update in ["yes", "true"]:
         options.update = True

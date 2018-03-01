@@ -21,6 +21,7 @@ class Docker:
         self._set_profile()
         self._tweak_settings()
         self._enable_overlays(map(os.path.basename, overlay_dirs))
+        self._enable_test()
         self._unmask_atom()
         self._unmask()
         self._update()
@@ -165,20 +166,37 @@ class Docker:
             self.execute("echo \"master = gentoo\" >> "
                          "/etc/portage/repos.conf/overlays.conf")
 
+    def _enable_test(self):
+        """Enable test FEATURES for ATOM."""
+
+        if options.options.atom is not None:
+            options.log.info("enabling test feature for %s" %
+                             options.options.atom)
+            self.execute("mkdir -p /etc/portage/env")
+            for a in options.options.atom:
+                self.execute(
+                    "echo \"%s tester.conf\" >> /etc/portage/package.env" % a)
+            self.execute(
+                "echo \"FEATURES=\\\"test splitdebug\\\"\" > /etc/portage/env/tester.conf")
+        else:
+            options.log.info("enabling tests skipped, no atoms specified")
+
     def _unmask_atom(self):
         """Unmask the atom to install."""
 
-        options.log.info("unmasking atom")
         if options.options.atom is not None:
+            options.log.info("unmasking %s" % options.options.atom)
             for a in options.options.atom:
                 self.execute(
-                    "echo \"" + a + "\" ~amd64 >> " +
+                    "echo \"" + str(a) + "\" ~amd64 >> " +
                     "/etc/portage/package.accept_keywords")
             if len(options.options.use) > 0:
                 for a in options.options.atom:
                     self.execute(
                         "echo %s %s >> /etc/portage/package.use/testbuild" %
-                        (a, " ".join(options.options.use)))
+                        (str(a), " ".join(options.options.use)))
+        else:
+            options.log.info("no atoms to unmask")
 
     def _unmask(self):
         """Unmask other atoms."""
@@ -204,9 +222,10 @@ class Docker:
     def _install_basics(self):
         """Install some basic packages."""
 
-        options.log.info("installing basic packages: " +
-                         ", ".join(options.base_packages))
-        self.execute("emerge --verbose %s" % " ".join(options.base_packages))
+        options.log.info("installing basic packages: %s" %
+                         options.base_packages)
+        self.execute("emerge --verbose %s" %
+                     " ".join(map(str, options.base_packages)))
 
     def _set_gcc(self):
         """Set gcc in the container."""

@@ -1,3 +1,4 @@
+from ebuildtester.atom import Atom
 import logging
 
 
@@ -7,8 +8,8 @@ def init():
     global log_ch
     global options
 
-    base_packages = ["app-portage/gentoolkit",
-                     "app-portage/flaggie", "app-portage/eix"]
+    base_packages = list(map(Atom, ["app-portage/gentoolkit",
+                                    "app-portage/flaggie", "app-portage/eix"]))
     options = None
     log = logging.getLogger("test-package")
     log_ch = logging.StreamHandler()
