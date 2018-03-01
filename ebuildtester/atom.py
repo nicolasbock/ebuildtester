@@ -13,7 +13,7 @@ class Atom(object):
             self.section, self.package = self.atom.split("/")
         except ValueError:
             raise AtomException(
-                "ATOM has to be of the form SECTION/PACKAGE[-VERSION]")
+                "ATOM has to be of the form [=]SECTION/PACKAGE[-VERSION]")
         temp = self.package.split("-")
         if len(temp) == 1:
             self.package_name = self.package
