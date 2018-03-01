@@ -24,9 +24,15 @@ class Atom(object):
     def __str__(self):
         if self.package_version is not None:
             prefix = "="
+            suffix = "-" + self.package_version
         else:
             prefix = ""
-        return prefix + self.atom
+            suffix = ""
+        return prefix + self.section + "/" + self.package_name + suffix
+
+    def __eq__(self, other):
+        result = (self.atom == other.atom)
+        return result
 
     def __repr__(self):
         return self.atom
