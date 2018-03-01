@@ -35,4 +35,4 @@ class Atom(object):
         return result
 
     def __repr__(self):
-        return self.atom
+        return "Atom(\"%s\")" % self.__str__()
