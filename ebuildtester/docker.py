@@ -170,6 +170,12 @@ class Docker:
         """Enable test FEATURES for ATOM."""
 
         options.log.info("enabling test feature for %s" % options.options.atom)
+        self.execute("mkdir -p /etc/portage/env")
+        for a in options.options.atom:
+            self.execute(
+                "echo \"%s tester.conf\" >> /etc/portage/package.env" % a)
+        self.execute(
+            "echo \"FEATURES=\\\"test splitdebug\\\"\" > /etc/portage/env/tester.conf")
 
     def _unmask_atom(self):
         """Unmask the atom to install."""
