@@ -1,3 +1,9 @@
+class AtomException(Exception):
+
+    def __init__(self, msg):
+        super(AtomException, self).__init__(msg)
+
+
 class Atom(object):
 
     def __init__(self, atom):
@@ -6,7 +12,7 @@ class Atom(object):
         try:
             self.section, self.package = self.atom.split("/")
         except ValueError:
-            raise Exception(
+            raise AtomException(
                 "ATOM has to be of the form SECTION/PACKAGE[-VERSION]")
         temp = self.package.split("-")
         if len(temp) == 1:

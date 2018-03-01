@@ -1,8 +1,9 @@
 import unittest
-from ebuildtester.atom import Atom
+from ebuildtester.atom import Atom, AtomException
 
 
 class TestAtom(unittest.TestCase):
 
     def test_equals(self):
-        atom = Atom("ATOM")
+        with self.assertRaises(AtomException) as e:
+            Atom("ATOM")
