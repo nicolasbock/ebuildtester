@@ -88,7 +88,7 @@ def parse_commandline(args):
     if options.with_X:
         options.atom += ["net-misc/tigervnc", "x11-wm/icewm"]
 
-    options.atom = map(Atom, options.atom)
+    options.atom = list(map(Atom, options.atom))
 
     if options.update in ["yes", "true"]:
         options.update = True
