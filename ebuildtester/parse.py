@@ -1,6 +1,7 @@
 from ebuildtester.atom import Atom
 from pkg_resources import get_distribution
 import argparse
+import multiprocessing
 
 
 def parse_commandline(args):
@@ -41,8 +42,8 @@ def parse_commandline(args):
     parser.add_argument(
         "--threads",
         metavar="N",
-        help="Use N threads to build packages",
-        default=1,
+        help="Use N (default %(default)s) threads to build packages",
+        default=multiprocessing.cpu_count(),
         type=int)
     parser.add_argument(
         "--use",
