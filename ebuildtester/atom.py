@@ -7,28 +7,38 @@ class AtomException(Exception):
 class Atom(object):
 
     def __init__(self, atom):
+        # We expect an atom of the form [=]CATEGORY/PACKAGE[-VERSION].
+        self.category = None
+        self.package = None
+        self.version = None
+
+        # We don't store the optional '='.
         temp = atom.split("=")
         self.atom = temp[-1]
+
         try:
-            self.section, self.package = self.atom.split("/")
+            self.category, self.package = self.atom.split("/")
         except ValueError:
             raise AtomException(
                 "ATOM has to be of the form [=]SECTION/PACKAGE[-VERSION]")
-        temp = self.package.split("-")
-        if len(temp) == 1:
-            self.package_name = self.package
-            self.package_version = None
-        else:
-            self.package_name, self.package_version = temp
+
+        # Split off version.
+        try:
+            temp = self.package.index("-")
+            if temp > -1:
+                self.version = self.package[temp + 1:]
+                self.package = self.package[:temp]
+        except ValueError:
+            pass
 
     def __str__(self):
-        if self.package_version is not None:
+        if self.version is not None:
             prefix = "="
-            suffix = "-" + self.package_version
+            suffix = "-" + self.version
         else:
             prefix = ""
             suffix = ""
-        return prefix + self.section + "/" + self.package_name + suffix
+        return prefix + self.category + "/" + self.package + suffix
 
     def __eq__(self, other):
         result = (self.atom == other.atom)
