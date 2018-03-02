@@ -56,13 +56,19 @@ The command understands the following command line arguments:
 
 .. code-block:: bash
 
-   usage: ebuildtester [-h] [--atom ATOM [ATOM ...]] [--manual] --portage-dir
-                       PORTAGE_DIR [--overlay-dir OVERLAY_DIR] [--update]
-                       [--threads N] [--use USE [USE ...]] [--unmask ATOM]
-                       [--gcc-version VER] [--with-X]
+   usage: ebuildtester [-h] [--version] [--atom ATOM [ATOM ...]] [--manual]
+                       --portage-dir PORTAGE_DIR [--overlay-dir OVERLAY_DIR]
+                       [--update {yes,true,no,false}] [--threads N]
+                       [--use USE [USE ...]] [--unmask ATOM] [--gcc-version VER]
+                       [--with-X]
+                       [--profile {default/linux/amd64/17.0,default/linux/amd64/17.0/systemd}]
+
+   A dockerized approach to test a Gentoo package within a clean stage3. This is
+   version 0.1.7
 
    optional arguments:
      -h, --help            show this help message and exit
+     --version             show program's version number and exit
      --atom ATOM [ATOM ...]
                            The package atom(s) to install
      --manual              Install package manually
@@ -70,12 +76,15 @@ The command understands the following command line arguments:
                            The local portage directory
      --overlay-dir OVERLAY_DIR
                            Add overlay dir (can be used multiple times)
-     --update              Update container before installing atom
-     --threads N           Use N threads to build packages
+     --update {yes,true,no,false}
+                           Update container before installing atom
+     --threads N           Use N (default 8) threads to build packages
      --use USE [USE ...]   The use flags for the atom
      --unmask ATOM         Unmask atom (can be used multiple times)
      --gcc-version VER     Use gcc version VER
      --with-X              Install VNC server to test graphical applications
+     --profile {default/linux/amd64/17.0,default/linux/amd64/17.0/systemd}
+                           The profile to use
 
 Mailing List
 ============
