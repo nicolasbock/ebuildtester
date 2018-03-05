@@ -24,11 +24,11 @@ def main():
     if options.options.manual:
         container.shell()
     else:
-        container.execute("echo emerge --ask --autounmask-write=n --verbose " +
+        container.execute("echo emerge --ask --autounmask-write=y --verbose " +
                           " ".join(map(str, options.options.atom)) +
                           " >> ~/.bash_history")
         try:
-            container.execute("emerge --autounmask-write=n --verbose " +
+            container.execute("emerge --autounmask-write=y --verbose " +
                               " ".join(options.options.atom))
         except ExecuteFailure:
             options.log.warn("ignoring failure of command")
