@@ -65,6 +65,12 @@ def parse_commandline(args):
         help="Remove container after session is done",
         action="store_true")
     parser.add_argument(
+        "--python",
+        metavar="PY",
+        help="Use Python version PY",
+        choices=["3.4"],
+        default="3.4")
+    parser.add_argument(
         "--with-X",
         help="Install VNC server to test graphical applications",
         default=False,
