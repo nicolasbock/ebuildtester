@@ -40,3 +40,6 @@ def main():
                 break
         options.log.info("opening interactive shell")
         container.shell()
+
+    if options.options.rm:
+        container.remove()
