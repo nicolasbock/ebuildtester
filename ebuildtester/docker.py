@@ -83,9 +83,10 @@ class Docker:
 
         import subprocess
 
-        options.log.info("deleting container")
+        options.log.info("stopping container")
         docker = subprocess.Popen(["docker", "kill", self.cid])
         docker.wait()
+        options.log.info("deleting container")
         docker = subprocess.Popen(["docker", "rm", self.cid])
         docker.wait()
 
