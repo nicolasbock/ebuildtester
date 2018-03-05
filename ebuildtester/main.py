@@ -1,7 +1,7 @@
-import logging
 from ebuildtester.docker import Docker, ExecuteFailure
 from ebuildtester.parse import parse_commandline
 import ebuildtester.options as options
+import logging
 import os.path
 import sys
 
