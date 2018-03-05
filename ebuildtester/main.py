@@ -1,5 +1,5 @@
 import logging
-from ebuildtester.docker import Docker
+from ebuildtester.docker import Docker, ExecuteFailure
 from ebuildtester.parse import parse_commandline
 import ebuildtester.options as options
 import os.path
@@ -30,12 +30,12 @@ def main():
         try:
             container.execute("emerge --autounmask-write=n --verbose " +
                               " ".join(options.options.atom))
-        except Exception:
+        except ExecuteFailure:
             options.log.warn("ignoring failure of command")
         container.execute("etc-update --automode -5")
         try:
             container.execute("emerge --verbose " +
                               " ".join(options.options.atom))
-        except Exception:
+        except ExecuteFailure:
             options.log.warn("ignoring failure of command")
         container.shell()

@@ -2,6 +2,10 @@ import ebuildtester.options as options
 from ebuildtester.utils import massage_string
 
 
+class ExecuteFailure(Exception):
+    pass
+
+
 class Docker:
 
     def __init__(self, local_portage, overlay_dirs):
@@ -62,7 +66,7 @@ class Docker:
         docker.wait()
         if docker.returncode != 0:
             options.log.error("running in container %s" % (str(self.cid)))
-            raise Exception("failed command \"%s\"" % (cmd))
+            raise ExecuteFailure("failed command \"%s\"" % (cmd))
 
     def shell(self):
         """Run an interactive shell in container."""
