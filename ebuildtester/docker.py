@@ -78,6 +78,17 @@ class Docker:
                                    self.cid, "/bin/bash"])
         docker.wait()
 
+    def remove(self):
+        """Remove the docker container."""
+
+        import subprocess
+
+        options.log.info("deleting container")
+        docker = subprocess.Popen(["docker", "kill", self.cid])
+        docker.wait()
+        docker = subprocess.Popen(["docker", "rm", self.cid])
+        docker.wait()
+
     def _reader(self, proc, stream, name):
         """Read from a subprocess stream."""
 

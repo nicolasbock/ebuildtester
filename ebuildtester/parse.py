@@ -61,6 +61,10 @@ def parse_commandline(args):
         metavar="VER",
         help="Use gcc version VER")
     parser.add_argument(
+        "--rm",
+        help="Remove container after session is done",
+        action="store_true")
+    parser.add_argument(
         "--with-X",
         help="Install VNC server to test graphical applications",
         default=False,

@@ -39,3 +39,6 @@ def main():
         except ExecuteFailure:
             options.log.warn("ignoring failure of command")
         container.shell()
+
+    if options.options.rm:
+        container.remove()
