@@ -24,18 +24,19 @@ def main():
     if options.options.manual:
         container.shell()
     else:
-        container.execute("echo emerge --ask --autounmask-write=n --verbose " +
+        container.execute("echo emerge --ask --autounmask-write=y --verbose " +
                           " ".join(map(str, options.options.atom)) +
                           " >> ~/.bash_history")
-        try:
-            container.execute("emerge --autounmask-write=n --verbose " +
-                              " ".join(options.options.atom))
-        except ExecuteFailure:
-            options.log.warn("ignoring failure of command")
-        container.execute("etc-update --automode -5")
-        try:
-            container.execute("emerge --verbose " +
-                              " ".join(options.options.atom))
-        except ExecuteFailure:
-            options.log.warn("ignoring failure of command")
+        for i in range(5):
+            options.log.info("emerge attempt %d (of %d)" % (i + 1, 5))
+            try:
+                container.execute("emerge --autounmask-write=y --verbose " +
+                                  " ".join(map(str, options.options.atom)))
+            except ExecuteFailure:
+                options.log.warn(
+                    "command failed, updating configuration files")
+                container.execute("etc-update --automode -5")
+            else:
+                break
+        options.log.info("opening interactive shell")
         container.shell()
