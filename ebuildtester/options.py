@@ -9,7 +9,7 @@ def init():
     global options
 
     base_packages = list(map(Atom, ["app-portage/gentoolkit",
-                                    "app-portage/flaggie", "app-portage/eix"]))
+                                    "app-portage/flaggie"]))
     options = None
     log = logging.getLogger("test-package")
     log_ch = logging.StreamHandler()
