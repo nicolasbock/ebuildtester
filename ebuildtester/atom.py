@@ -1,7 +1,5 @@
 class AtomException(Exception):
-
-    def __init__(self, msg):
-        super(AtomException, self).__init__(msg)
+    pass
 
 
 class Atom(object):
