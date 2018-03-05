@@ -121,6 +121,7 @@ class Docker:
             "--cap-add", "SYS_ADMIN",
             "--device", "/dev/fuse",
             "--storage-opt", "size=50G",
+            "--cpus", str(options.options.threads),
             "--workdir", "/root",
             "--volume", "%s:/usr/portage" % local_portage,
             "--volume", "/usr/portage/distfiles:/usr/portage/distfiles"]

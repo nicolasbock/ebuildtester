@@ -68,7 +68,7 @@ def parse_commandline(args):
         "--python",
         metavar="PY",
         help="Use Python version PY",
-        choices=["3.4"],
+        choices=["3.4", "3.5", "3.6"],
         default="3.4")
     parser.add_argument(
         "--with-X",
