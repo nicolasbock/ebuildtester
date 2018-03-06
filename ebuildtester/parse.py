@@ -67,9 +67,9 @@ def parse_commandline(args):
     parser.add_argument(
         "--python",
         metavar="PY",
-        help="Use Python version PY",
+        help="Use Python interpreter version PY",
         choices=["3.4", "3.5", "3.6"],
-        default="3.4")
+        default="3.5")
     parser.add_argument(
         "--with-X",
         help="Install VNC server to test graphical applications",
