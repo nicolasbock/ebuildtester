@@ -28,9 +28,10 @@ class Docker:
         self._enable_test()
         self._unmask_atom()
         self._unmask()
+        self._set_gcc()
+        self._set_python()
         self._update()
         self._install_basics()
-        self._set_gcc()
         self._print_summary()
 
     def execute(self, cmd):
@@ -225,6 +226,29 @@ class Docker:
                 "echo \"%s\" ~amd64 >> /etc/portage/package.accept_keywords" %
                 a)
 
+    def _set_gcc(self):
+        """Set gcc in the container."""
+
+        import re
+
+        options.log.info("setting gcc")
+        if options.options.gcc_version:
+            self.execute(
+                ("echo =sys-devel/gcc-%s ** >> " % options.options.gcc_version) +
+                "/etc/portage/package.accept_keywords")
+            self.execute("emerge --verbose sys-devel/gcc")
+            gcc = re.sub("-r[0-9]+$", "", options.options.gcc_version)
+            self.execute("gcc-config $(gcc-config --list-profiles | " +
+                         ("grep %s | " % gcc) +
+                         "sed -e 's:^.*\[\([0-9]\+\)\].*:\\1:')")
+            self.execute("emerge --verbose --oneshot sys-devel/libtool")
+
+    def _set_python(self):
+        """Set the Python version."""
+
+        options.log.info("setting Python version")
+        self.execute("eselect python show")
+
     def _update(self):
         """Update container."""
 
@@ -243,23 +267,6 @@ class Docker:
                          options.base_packages)
         self.execute("emerge --verbose %s" %
                      " ".join(map(str, options.base_packages)))
-
-    def _set_gcc(self):
-        """Set gcc in the container."""
-
-        import re
-
-        options.log.info("setting gcc")
-        if options.options.gcc_version:
-            self.execute(
-                ("echo =sys-devel/gcc-%s ** >> " % options.options.gcc_version) +
-                "/etc/portage/package.accept_keywords")
-            self.execute("emerge --verbose sys-devel/gcc")
-            gcc = re.sub("-r[0-9]+$", "", options.options.gcc_version)
-            self.execute("gcc-config $(gcc-config --list-profiles | " +
-                         ("grep %s | " % gcc) +
-                         "sed -e 's:^.*\[\([0-9]\+\)\].*:\\1:')")
-            self.execute("emerge --verbose --oneshot sys-devel/libtool")
 
     def _print_summary(self):
         """Print summary."""
