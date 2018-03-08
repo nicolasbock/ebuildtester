@@ -40,8 +40,8 @@ class Docker:
         cmd is a string which is executed within a bash shell.
         """
 
+        from multiprocessing import Process, Pipe
         import os
-        import subprocess
         import sys
 
         options.log.info("%s %s" % (self.cid[:6], cmd))
@@ -54,7 +54,15 @@ class Docker:
                                   universal_newlines=True)
         docker.stdin.write(cmd + "\n")
         docker.stdin.close()
-        stdout_reader = os.fork()
+
+        stdout_parent_connection, stdout_child_connection = Pipe()
+        stdout_reader = Process(target=self._reader,
+                                args=(docker, stdout_child_connection, "stdout"))
+
+        stderr_parent_connection, stderr_child_connection = Pipe()
+        stderr_reader = Process(target=self._reader,
+                                args=(docker, stderr_child_connection, "stderr"))
+
         if stdout_reader == 0:
             self._reader(docker, docker.stdout, "stdout")
             sys.exit(0)
@@ -91,7 +99,7 @@ class Docker:
         docker = subprocess.Popen(["docker", "rm", self.cid])
         docker.wait()
 
-    def _reader(self, proc, stream, name):
+    def _reader(self, proc, connection, name):
         """Read from a subprocess stream."""
 
         while True:
