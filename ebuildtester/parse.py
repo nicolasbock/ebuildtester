@@ -21,6 +21,10 @@ def parse_commandline(args):
         nargs="+",
         action="append")
     parser.add_argument(
+        "--live-ebuild",
+        help="Unmask the live ebuild of the atom",
+        action="store_true")
+    parser.add_argument(
         "--manual",
         help="Install package manually",
         default=False,
@@ -51,11 +55,20 @@ def parse_commandline(args):
         default=[],
         nargs="+")
     parser.add_argument(
+        "--global-use",
+        help="Set global USE flag",
+        default=[],
+        nargs="+")
+    parser.add_argument(
         "--unmask",
         metavar="ATOM",
         help="Unmask atom (can be used multiple times)",
         default=[],
         action="append")
+    parser.add_argument(
+        "--unstable",
+        help="Globally 'unstable' system, i.e. ~amd64",
+        action="store_true")
     parser.add_argument(
         "--gcc-version",
         metavar="VER",
