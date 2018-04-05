@@ -62,9 +62,9 @@ class TestParse(unittest.TestCase):
             self.args + ["--gcc-version", "VER"])
         self.assertEqual("VER", options.gcc_version)
 
-    def test_with_X(self):
+    def test_with_vnc(self):
         options = ebuildtester.parse.parse_commandline(
-            self.args + ["--with-X"])
-        self.assertTrue(options.with_X)
+            self.args + ["--with-vnc"])
+        self.assertTrue(options.with_vnc)
         self.assertTrue(Atom("net-misc/tigervnc") in options.atom)
         self.assertTrue(Atom("x11-wm/icewm") in options.atom)

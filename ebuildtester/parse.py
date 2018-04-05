@@ -79,8 +79,11 @@ def parse_commandline(args):
         action="store_true")
     parser.add_argument(
         "--with-X",
+        help="Globally enable the X USE flag",
+        action="store_true")
+    parser.add_argument(
+        "--with-vnc",
         help="Install VNC server to test graphical applications",
-        default=False,
         action="store_true")
     parser.add_argument(
         "--profile",
@@ -102,7 +105,7 @@ def parse_commandline(args):
     else:
         options.atom = []
 
-    if options.with_X:
+    if options.with_vnc:
         options.atom += ["net-misc/tigervnc", "x11-wm/icewm"]
 
     options.atom = list(map(Atom, options.atom))

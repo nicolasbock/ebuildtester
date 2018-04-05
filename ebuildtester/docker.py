@@ -172,6 +172,8 @@ class Docker:
         if options.options.unstable:
             self.execute("echo ACCEPT_KEYWORDS=\\\"~amd64\\\" " +
                          ">> /etc/portage/make.conf")
+        if options.options.with_X:
+            self.execute("echo USE=\\\"X\\\" >> /etc/portage/make.conf")
 
     def _enable_overlays(self, overlays):
         """Enable overlays."""
