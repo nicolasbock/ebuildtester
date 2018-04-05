@@ -169,6 +169,9 @@ class Docker:
                      ">> /etc/portage/make.conf")
         self.execute(("echo MAKEOPTS=\\\"-j%d\\\" " % (options.options.threads)) +
                      ">> /etc/portage/make.conf")
+        if options.options.unstable:
+            self.execute("echo ACCEPT_KEYWORDS=\\\"~amd64\\\" " +
+                         ">> /etc/portage/make.conf")
 
     def _enable_overlays(self, overlays):
         """Enable overlays."""
@@ -203,8 +206,12 @@ class Docker:
         if options.options.atom is not None:
             options.log.info("unmasking %s" % options.options.atom)
             for a in options.options.atom:
+                if options.options.live_ebuild:
+                    unmask_keyword = "**"
+                else:
+                    unmask_keyword = "~amd64"
                 self.execute(
-                    "echo \"" + str(a) + "\" ~amd64 >> " +
+                    "echo \"" + str(a) + "\" " + unmask_keyword + " >> " +
                     "/etc/portage/package.accept_keywords")
             if len(options.options.use) > 0:
                 for a in options.options.atom:
