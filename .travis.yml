@@ -12,6 +12,7 @@ install:
 
 script:
   - bandit ebuildtester
+  - pycodestyle ebuildtester
   - python setup.py build
   - python setup.py test
   - python setup.py install
