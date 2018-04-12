@@ -167,7 +167,8 @@ class Docker:
         # docker container.
         self.execute("echo FEATURES=\\\"-sandbox -usersandbox\\\" " +
                      ">> /etc/portage/make.conf")
-        self.execute(("echo MAKEOPTS=\\\"-j%d\\\" " % (options.options.threads)) +
+        self.execute(("echo MAKEOPTS=\\\"-j%d\\\" " %
+                      (options.options.threads)) +
                      ">> /etc/portage/make.conf")
         if options.options.unstable:
             self.execute("echo ACCEPT_KEYWORDS=\\\"~amd64\\\" " +
@@ -196,7 +197,8 @@ class Docker:
                 self.execute(
                     "echo \"%s tester.conf\" >> /etc/portage/package.env" % a)
             self.execute(
-                "echo \"FEATURES=\\\"test splitdebug\\\"\" > /etc/portage/env/tester.conf")
+                "echo \"FEATURES=\\\"test splitdebug\\\"\" " +
+                "> /etc/portage/env/tester.conf")
         else:
             options.log.info("enabling tests skipped, no atoms specified")
 
@@ -258,13 +260,14 @@ class Docker:
         options.log.info("setting gcc")
         if options.options.gcc_version:
             self.execute(
-                ("echo =sys-devel/gcc-%s ** >> " % options.options.gcc_version) +
+                ("echo =sys-devel/gcc-%s ** >> " %
+                 options.options.gcc_version) +
                 "/etc/portage/package.accept_keywords")
             self.execute("emerge --verbose sys-devel/gcc")
             gcc = re.sub("-r[0-9]+$", "", options.options.gcc_version)
             self.execute("gcc-config $(gcc-config --list-profiles | " +
                          ("grep %s | " % gcc) +
-                         "sed -e 's:^.*\[\([0-9]\+\)\].*:\\1:')")
+                         "sed -e 's:^.*\\[\\([0-9]\\+\\)\\].*:\\1:')")
             self.execute("emerge --verbose --oneshot sys-devel/libtool")
 
     def _print_summary(self):
