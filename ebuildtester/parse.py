@@ -13,7 +13,7 @@ def parse_commandline(args):
     parser.add_argument(
         "--version",
         action="version",
-        version=get_distribution("ebuildtester").version)
+        version="v" + get_distribution("ebuildtester").version)
     parser.add_argument(
         "--atom",
         help="The package atom(s) to install",
