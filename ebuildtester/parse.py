@@ -9,8 +9,7 @@ def parse_commandline(args):
 
     parser = argparse.ArgumentParser(
         description="A dockerized approach to test a Gentoo "
-        "package within a clean stage3. This is version " +
-        get_distribution("ebuildtester").version)
+        "package within a clean stage3.")
     parser.add_argument(
         "--version",
         action="version",
