@@ -27,6 +27,7 @@ def main():
         container.execute("echo emerge --ask --autounmask-write=y --verbose " +
                           " ".join(map(str, options.options.atom)) +
                           " >> ~/.bash_history")
+
         for i in range(5):
             options.log.info("emerge attempt %d (of %d)" % (i + 1, 5))
             try:
@@ -41,5 +42,4 @@ def main():
         options.log.info("opening interactive shell")
         container.shell()
 
-    if options.options.rm:
-        container.remove()
+        container.cleanup()
