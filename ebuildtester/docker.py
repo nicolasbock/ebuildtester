@@ -53,17 +53,39 @@ class Docker:
                                   universal_newlines=True)
         docker.stdin.write(cmd + "\n")
         docker.stdin.close()
+
         stdout_reader = os.fork()
         if stdout_reader == 0:
-            self._reader(docker, docker.stdout, "stdout")
+            try:
+                self._reader(docker, docker.stdout, "stdout")
+            except KeyboardInterrupt:
+                pass
             sys.exit(0)
+
         stderr_reader = os.fork()
         if stderr_reader == 0:
-            self._reader(docker, docker.stderr, "stderr")
+            try:
+                self._reader(docker, docker.stderr, "stderr")
+            except KeyboardInterrupt:
+                pass
             sys.exit(0)
-        os.waitid(os.P_PID, stdout_reader, os.WEXITED)
-        os.waitid(os.P_PID, stderr_reader, os.WEXITED)
-        docker.wait()
+
+        try:
+            os.waitid(os.P_PID, stdout_reader, os.WEXITED)
+            os.waitid(os.P_PID, stderr_reader, os.WEXITED)
+            docker.wait()
+        except KeyboardInterrupt:
+            try:
+                options.log.info("received keyboard interrupt")
+                docker.terminate()
+                self.shell()
+                options.log.info("return from shell, initiating shutdown")
+                self.cleanup()
+                sys.exit(0)
+            except OSError:
+                pass
+            docker.wait()
+
         if docker.returncode != 0:
             options.log.error("running in container %s" % (str(self.cid)))
             raise ExecuteFailure("failed command \"%s\"" % (cmd))
@@ -76,7 +98,16 @@ class Docker:
         options.log.info("running interactive shell in container")
         docker = subprocess.Popen(["docker", "exec", "--tty", "--interactive",
                                    self.cid, "/bin/bash"])
-        docker.wait()
+        try:
+            docker.wait()
+        except KeyboardInterrupt:
+            options.log.info("ignoring keyboard interrupt")
+
+    def cleanup(self):
+        """Clean up."""
+
+        if options.options.rm:
+            self.remove()
 
     def remove(self):
         """Remove the docker container."""
