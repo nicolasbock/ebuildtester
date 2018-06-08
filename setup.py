@@ -9,7 +9,7 @@ setup(
     name="ebuildtester",
     author="Nicolas Bock",
     author_email="nicolasbock@gmail.com",
-    description="A container approach to test a Gentoo package within a clean stage3",
+    description="A container approach to test a Gentoo package within a clean stage3 container",
     license="BSD",
     url="http://ebuildtester.readthedocs.io/",
     long_description=long_description,
