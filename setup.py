@@ -13,7 +13,7 @@ setup(
     license="BSD",
     url="https://github.com/nicolasbock/gentoo-test-package",
     long_description=long_description,
-    long_description_content_type="text/rst",
+    long_description_content_type="text/x-rst",
     use_scm_version=True,
     setup_requires=['setuptools_scm'],
     packages=["ebuildtester"],
