@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from setuptools import setup, find_packages
+from setuptools import setup
 
 with open("README.rst", "r") as fh:
     long_description = fh.read()
@@ -9,9 +9,9 @@ setup(
     name="ebuildtester",
     author="Nicolas Bock",
     author_email="nicolasbock@gmail.com",
-    description="A container approach to test a Gentoo package within a clean stage3",
+    description="A container approach to test a Gentoo package within a clean stage3 container",
     license="BSD",
-    url="https://github.com/nicolasbock/gentoo-test-package",
+    url="http://ebuildtester.readthedocs.io/",
     long_description=long_description,
     long_description_content_type="text/x-rst",
     use_scm_version=True,
