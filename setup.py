@@ -20,9 +20,10 @@ setup(
     use_scm_version=True,
     setup_requires=['setuptools_scm'],
     packages=["ebuildtester"],
-    package_dir={"ebuildtester": "ebuildtester"},
-    package_data={"ebuildtester": ["data/ebuildtester.bash-completion"]},
-    # data_files=[(".", ["ebuildtester/data/ebuildtester.bash-completion"])],
+    # package_dir={"ebuildtester": "ebuildtester"},
+    # package_data={"ebuildtester": ["data/ebuildtester.bash-completion"]},
+    # include_package_data=True,
+    data_files=[(".", ["ebuildtester/data/ebuildtester.bash-completion"])],
     entry_points={
         "console_scripts": [
             "ebuildtester = ebuildtester.main:main"
