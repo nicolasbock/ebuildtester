@@ -14,6 +14,7 @@ setup(
     description="A container approach to test a Gentoo package within a clean stage3 container",
     license="BSD",
     url="http://ebuildtester.readthedocs.io/",
+    download_url="https://github.com/nicolasbock/ebuildtester",
     long_description=long_description,
     long_description_content_type="text/x-rst",
     use_scm_version=True,
