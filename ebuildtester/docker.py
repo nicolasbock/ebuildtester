@@ -247,7 +247,7 @@ class Docker:
                     unmask_keyword = "~amd64"
                 self.execute(
                     "echo \"" + str(a) + "\" " + unmask_keyword + " >> " +
-                    "/etc/portage/package.accept_keywords")
+                    "/etc/portage/package.accept_keywords/testbuild")
             if len(options.options.use) > 0:
                 for a in options.options.atom:
                     self.execute(
