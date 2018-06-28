@@ -36,7 +36,7 @@ def main():
             except ExecuteFailure:
                 options.log.warn(
                     "command failed, updating configuration files")
-                container.execute("etc-update --automode -5")
+                container.execute("etc-update --verbose --automode -5")
             else:
                 break
         options.log.info("opening interactive shell")
