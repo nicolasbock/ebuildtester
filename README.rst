@@ -25,8 +25,10 @@ Requirements
 
 You require `Docker <https://wiki.gentoo.org/wiki/Docker>`_ and `FUSE
 <https://wiki.gentoo.org/wiki/Filesystem_in_Userspace>`_. Docker must be
-configured to use the devicemapper storage driver.  This can be achieved with
-the following inside ``etc/docker/daemon.json``:
+configured to use the `devicemapper
+<https://docs.docker.com/storage/storagedriver/device-mapper-driver/>`_
+storage driver.  This can be achieved with the following inside
+``/etc/docker/daemon.json``:
 
 .. code-block:: javascript
 
