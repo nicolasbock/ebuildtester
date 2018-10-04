@@ -245,6 +245,7 @@ class Docker:
                     unmask_keyword = "**"
                 else:
                     unmask_keyword = "~amd64"
+                self.execute("mkdir -p /etc/portage/package.accept_keywords")
                 self.execute(
                     "echo \"" + str(a) + "\" " + unmask_keyword + " >> " +
                     "/etc/portage/package.accept_keywords/testbuild")
@@ -262,6 +263,7 @@ class Docker:
         options.log.info("unmasking additional atoms")
         for a in options.options.unmask:
             options.log.info("  unmasking %s" % a)
+            self.execute("mkdir -p /etc/portage/package.accept_keywords")
             self.execute(
                 "echo \"%s\" ~amd64 >> /etc/portage/package.accept_keywords" %
                 a)
@@ -292,6 +294,7 @@ class Docker:
 
         options.log.info("setting gcc")
         if options.options.gcc_version:
+            self.execute("mkdir -p /etc/portage/package.accept_keywords")
             self.execute(
                 ("echo =sys-devel/gcc-%s ** >> " %
                  options.options.gcc_version) +
@@ -307,8 +310,9 @@ class Docker:
         """Print summary."""
 
         options.log.info("summary")
-        self.execute("if [[ -f /etc/portage/accept_keywords ]]; then " +
-                     "cat /etc/portage/package.accept_keywords; fi")
+        self.execute(
+            "if [[ -d /etc/portage/package.accept_keywords ]]; then " +
+            "cat /etc/portage/package.accept_keywords/*; fi")
         self.execute("if [[ -f /etc/portage/package.use/testbuild ]]; then " +
                      "cat /etc/portage/package.use/testbuild; fi")
         self.execute("emerge --info")
