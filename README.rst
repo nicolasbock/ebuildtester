@@ -68,13 +68,13 @@ The command understands the following command line arguments:
 .. code-block:: bash
 
     usage: ebuildtester [-h] [--version] [--atom ATOM [ATOM ...]] [--live-ebuild]
-                        [--manual] --portage-dir PORTAGE_DIR
-                        [--overlay-dir OVERLAY_DIR] [--update {yes,true,no,false}]
-                        [--threads N] [--use USE [USE ...]]
-                        [--global-use GLOBAL_USE [GLOBAL_USE ...]] [--unmask ATOM]
-                        [--unstable] [--gcc-version VER] [--rm] [--with-X]
-                        [--with-vnc]
-                        [--profile {default/linux/amd64/17.0,default/linux/amd64/17.0/systemd}]
+                             [--manual] --portage-dir PORTAGE_DIR
+                             [--overlay-dir OVERLAY_DIR] [--update {yes,true,no,false}]
+                             [--threads N] [--use USE [USE ...]]
+                             [--global-use GLOBAL_USE [GLOBAL_USE ...]] [--unmask ATOM]
+                             [--unstable] [--gcc-version VER] [--rm] [--with-X]
+                             [--with-vnc]
+                             [--profile {default/linux/amd64/17.0,default/linux/amd64/17.0/systemd}]
 
     A dockerized approach to test a Gentoo package within a clean stage3.
 
@@ -102,4 +102,3 @@ The command understands the following command line arguments:
       --with-X              Globally enable the X USE flag
       --with-vnc            Install VNC server to test graphical applications
       --profile {default/linux/amd64/17.0,default/linux/amd64/17.0/systemd}
-                            The profile to use
