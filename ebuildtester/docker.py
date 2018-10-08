@@ -266,8 +266,8 @@ class Docker:
             options.log.info("  unmasking %s" % a)
             self.execute("mkdir -p /etc/portage/package.accept_keywords")
             self.execute(
-                "echo \"%s\" ~amd64 >> /etc/portage/package.accept_keywords" %
-                a)
+                "echo \"%s\" ~amd64 >> "
+                "/etc/portage/package.accept_keywords/testbuild" % a)
 
     def _update(self):
         """Update container."""
@@ -304,7 +304,7 @@ class Docker:
             self.execute(
                 ("echo =sys-devel/gcc-%s ** >> " %
                  options.options.gcc_version) +
-                "/etc/portage/package.accept_keywords")
+                "/etc/portage/package.accept_keywords/testbuild")
             self.execute("emerge --verbose sys-devel/gcc")
             gcc = re.sub("-r[0-9]+$", "", options.options.gcc_version)
             self.execute("gcc-config $(gcc-config --list-profiles | " +
