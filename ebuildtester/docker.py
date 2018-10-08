@@ -30,6 +30,7 @@ class Docker:
         self._unmask()
         self._update()
         self._install_basics()
+        self._enable_global_use()
         self._set_gcc()
         self._print_summary()
 
@@ -286,6 +287,11 @@ class Docker:
                          options.base_packages)
         self.execute("emerge --verbose %s" %
                      " ".join(map(str, options.base_packages)))
+
+    def _enable_global_use(self):
+        """Enable global USE settings."""
+        for u in options.options.global_use:
+            self.execute("euse --enable %s" % u)
 
     def _set_gcc(self):
         """Set gcc in the container."""
