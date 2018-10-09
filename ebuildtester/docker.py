@@ -290,8 +290,12 @@ class Docker:
 
     def _enable_global_use(self):
         """Enable global USE settings."""
-        for u in options.options.global_use:
-            self.execute("euse --enable %s" % u)
+        if not options.options.global_use:
+            options.log.info("no global USE flags given, skipping")
+        else:
+            options.log.info("setting global USE flags")
+            for u in options.options.global_use:
+                self.execute("euse --enable %s" % u)
 
     def _set_gcc(self):
         """Set gcc in the container."""
