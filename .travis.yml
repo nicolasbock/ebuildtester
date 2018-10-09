@@ -29,7 +29,8 @@ script:
   - sphinx-build -M html docs docs/_build
   - sphinx-build -M man docs docs/_build
   - sudo service docker status
-  - sudo bash -c "jq -n '{"storage-driver": "devicemapper"}' > /etc/docker/daemon.json"
+  - sudo bash -c "jq -n '{\"storage-driver\": \"devicemapper\"}' > /etc/docker/daemon.json"
+  - sudo service docker restart
   - CONTAINER_ID=$(ebuildtester --portage ~/gentoo --atom dev-python/ebuildtester)
 
 deploy:
