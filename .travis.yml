@@ -29,6 +29,7 @@ script:
   - sphinx-build -M html docs docs/_build
   - sphinx-build -M man docs docs/_build
   - sudo service docker status
+  - sudo ls -lh /etc/docker
   - CONTAINER_ID=$(ebuildtester --portage ~/gentoo --atom dev-python/ebuildtester)
 
 deploy:
