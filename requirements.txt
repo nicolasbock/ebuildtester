@@ -1,4 +1,5 @@
 bandit
+git+https://github.com/gentoo/portage.git@portage-2.3.89#egg=portage
 pycodestyle
 pytest
 sphinx
