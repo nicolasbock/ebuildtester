@@ -15,10 +15,6 @@ current) stage3 Docker container.
    :target: http://ebuildtester.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status
 
-.. image:: https://badge.waffle.io/nicolasbock/ebuildtester.svg?columns=all
-   :target: https://waffle.io/nicolasbock/ebuildtester
-   :alt: 'Waffle.io - Columns and their card count'
-
 
 Requirements
 ------------
