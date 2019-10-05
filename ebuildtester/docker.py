@@ -154,8 +154,8 @@ class Docker:
             "--device", "/dev/fuse",
             "--storage-opt", "size=50G",
             "--workdir", "/root",
-            "--volume", "%s:/usr/portage" % local_portage,
-            "--volume", "/usr/portage/distfiles:/usr/portage/distfiles"]
+            "--volume", "%s:/var/db/repos/gentoo" % local_portage,
+            "--volume", "%s/distfiles:/var/cache/distfiles" % local_portage]
         for o in overlays:
             docker_args += ["--volume=%s:%s" % o]
         docker_args += [docker_image]
