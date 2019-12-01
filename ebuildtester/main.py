@@ -1,3 +1,4 @@
+from ebuildtester.atom import Atom
 from ebuildtester.docker import Docker, ExecuteFailure
 from ebuildtester.parse import parse_commandline
 import ebuildtester.options as options
@@ -10,10 +11,31 @@ def main():
     """The main function."""
 
     options.init()
-
     options.log.setLevel(logging.DEBUG)
-
     options.options = parse_commandline(sys.argv[1:])
+
+    if not options.options.manual and options.options.atom is None:
+        raise Exception("either specify an atom or use --manual")
+
+    if options.options.shell_env is not None:
+        for e in options.options.shell_env:
+            options.sh_env.extend(list(set(e)))
+
+    if options.options.atom:
+        temp = []
+        for a in options.options.atom:
+            temp += a
+        options.options.atom = temp
+    else:
+        options.options.atom = []
+
+    if options.options.with_vnc:
+        options.options.atom += ["net-misc/tigervnc", "x11-wm/icewm"]
+
+    options.options.atom = list(map(Atom, options.options.atom))
+
+    if options.options.ccache_dir is not None:
+        options.base_packages.extend(list(map(Atom, ["dev-util/ccache"])))
 
     options.log.info("creating container")
     container = Docker(
@@ -42,4 +64,4 @@ def main():
         options.log.info("opening interactive shell")
         container.shell()
 
-        container.cleanup()
+    container.cleanup()

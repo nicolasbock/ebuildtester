@@ -1,5 +1,6 @@
 import ebuildtester.options as options
 from ebuildtester.utils import massage_string
+import os
 
 
 class ExecuteFailure(Exception):
@@ -11,20 +12,16 @@ class Docker:
     def __init__(self, local_portage, overlay_dirs):
         """Create a new container."""
 
-        import os.path
-
         docker_image = "gentoo/stage3-amd64"
-        overlay_dirs = list(set(overlay_dirs))
-        overlay_mountpoints = [os.path.join("/var/lib/overlays", p)
-                               for p in map(os.path.basename, overlay_dirs)]
+        repo_names = self._get_repo_names(overlay_dirs)
+        overlay_mountpoints = [os.path.join("/var/lib/overlays", r) for r in repo_names]
 
         self._setup_container(docker_image)
-        self._create_container(docker_image, local_portage,
-                               zip(overlay_dirs, overlay_mountpoints))
+        self._create_container(docker_image, local_portage, zip(overlay_dirs, overlay_mountpoints))
         self._start_container()
-        self._set_profile()
         self._tweak_settings()
-        self._enable_overlays(map(os.path.basename, overlay_dirs))
+        self._enable_overlays(repo_names)
+        self._enable_ccache()
         self._enable_test()
         self._unmask_atom()
         self._unmask()
@@ -40,12 +37,13 @@ class Docker:
         cmd is a string which is executed within a bash shell.
         """
 
-        import os
         import subprocess
         import sys
 
         options.log.info("%s %s" % (self.cid[:6], cmd))
         docker_cmd = ["docker", "exec", "--interactive"]
+        docker_cmd += self._set_env(options.exec_env)
+        docker_cmd += self._set_env(options.sh_env)
         docker_cmd += [self.cid, "/bin/bash"]
         docker = subprocess.Popen(docker_cmd,
                                   stdout=subprocess.PIPE,
@@ -97,8 +95,10 @@ class Docker:
         import subprocess
 
         options.log.info("running interactive shell in container")
-        docker = subprocess.Popen(["docker", "exec", "--tty", "--interactive",
-                                   self.cid, "/bin/bash"])
+        docker_cmd = ["docker", "exec", "--tty", "--interactive"]
+        docker_cmd += self._set_env(options.sh_env)
+        docker_cmd += [self.cid, "/bin/bash", "--login"]
+        docker = subprocess.Popen(docker_cmd)
         try:
             docker.wait()
         except KeyboardInterrupt:
@@ -136,11 +136,11 @@ class Docker:
     def _setup_container(self, docker_image):
         """Setup the container."""
 
-        import subprocess
-
-        docker_args = ["docker", "pull", docker_image]
-        docker = subprocess.Popen(docker_args)
-        docker.wait()
+        if options.options.pull:
+            import subprocess
+            docker_args = ["docker", "pull", docker_image]
+            docker = subprocess.Popen(docker_args)
+            docker.wait()
 
     def _create_container(self, docker_image, local_portage, overlays):
         """Create new container."""
@@ -152,12 +152,14 @@ class Docker:
             "--tty",
             "--cap-add", "SYS_ADMIN",
             "--device", "/dev/fuse",
-            "--storage-opt", "size=50G",
             "--workdir", "/root",
-            "--volume", "%s:/usr/portage" % local_portage,
-            "--volume", "/usr/portage/distfiles:/usr/portage/distfiles"]
+            "--volume", "%s:/var/db/repos/gentoo" % local_portage,
+            "--volume", "%s/distfiles:/var/cache/distfiles" % local_portage,
+            "--volume", "%s/packages:/var/cache/binpkgs" % local_portage]
         for o in overlays:
             docker_args += ["--volume=%s:%s" % o]
+        if options.options.ccache_dir is not None:
+            docker_args += ["--volume=%s:/var/cache/ccache" % " ".join(options.options.ccache_dir)]
         docker_args += [docker_image]
         options.log.info("creating docker container with: %s" %
                          " ".join(docker_args))
@@ -183,17 +185,24 @@ class Docker:
         if docker.returncode != 0:
             raise Exception("failure creating docker container")
 
-    def _set_profile(self):
-        """Set the Gentoo profile."""
+    def _set_env(self, env_list):
+        """Set some env params form global shell."""
 
-        options.log.info("setting Gentoo profile to %s" %
-                         options.options.profile)
-        self.execute("eselect profile set %s" % options.options.profile)
+        docker_env_args = []
+        for e in env_list:
+            docker_env_args += ["--env", e]
+        return docker_env_args
 
     def _tweak_settings(self):
-        """Tweak portage settings."""
+        """Tweak settings."""
 
-        options.log.info("tweaking portage settings")
+        options.log.info("tweaking settings")
+
+        self.execute("sed -i -e \"/^#en_US.UTF-8/s/^#//\" /etc/locale.gen && locale-gen")
+        self.execute("eselect locale set en_US.UTF-8")
+
+        options.log.info("setting Gentoo profile to %s" % options.options.profile)
+        self.execute("eselect profile set %s" % options.options.profile)
 
         # Disable the usersandbox feature, it's not working well inside a
         # docker container.
@@ -202,23 +211,63 @@ class Docker:
         self.execute(("echo MAKEOPTS=\\\"-j%d\\\" " %
                       (options.options.threads)) +
                      ">> /etc/portage/make.conf")
+        self.execute("echo EMERGE_DEFAULT_OPTS=\\\"--autounmask --autounmask-write --usepkg --oneshot\\\" " +
+                     ">> /etc/portage/make.conf")
         if options.options.unstable:
             self.execute("echo ACCEPT_KEYWORDS=\\\"~amd64\\\" " +
                          ">> /etc/portage/make.conf")
         if options.options.with_X:
             self.execute("echo USE=\\\"X\\\" >> /etc/portage/make.conf")
+        if options.options.with_vnc:
+            self.execute("mkdir -p /etc/portage/package.use")
+            self.execute("echo \"net-misc/tigervnc server\" >> /etc/portage/package.use/tigervnc")
 
-    def _enable_overlays(self, overlays):
+        self.execute("env-update")
+
+    def _get_repo_names(self, overlay_dirs):
+        """Get repo names from local overlay settings."""
+
+        repo_names = []
+        for o in overlay_dirs:
+            with open(os.path.join(o, "profiles/repo_name"), "r") as f:
+                for repo_name in f:
+                    repo_names.append(repo_name.replace("\n", ""))
+
+        return repo_names
+
+    def _enable_overlays(self, repo_names):
         """Enable overlays."""
 
         self.execute("mkdir -p /etc/portage/repos.conf")
-        for o in overlays:
+        for r in repo_names:
             self.execute("echo \"[%s]\" >> "
-                         "/etc/portage/repos.conf/overlays.conf" % o)
+                         "/etc/portage/repos.conf/overlays.conf" % r)
             self.execute("echo \"location = /var/lib/overlays/%s\" >> "
-                         "/etc/portage/repos.conf/overlays.conf" % o)
+                         "/etc/portage/repos.conf/overlays.conf" % r)
             self.execute("echo \"master = gentoo\" >> "
                          "/etc/portage/repos.conf/overlays.conf")
+
+    def _enable_ccache(self):
+        """Enable ccache."""
+
+        if options.options.ccache_dir is not None:
+            options.log.info("enabling ccache feature")
+            self.execute("mkdir -p /var/cache/ccache /tmp/ccache-tmpfiles")
+            self.execute("chown root:portage /var/cache/ccache /tmp/ccache-tmpfiles")
+            self.execute("chmod 2775 /var/cache/ccache /tmp/ccache-tmpfiles")
+            self.execute(
+                "echo -e \"FEATURES=\\\"\${FEATURES} ccache\\\"\n" +
+                "CCACHE_DIR=\\\"/var/cache/ccache\\\"\n" +
+                "CCACHE_MAXSIZE=\\\"30G\\\"\n" +
+                "CCACHE_UMASK=\\\"002\\\"\n" +
+                "CCACHE_NLEVELS=\\\"3\\\"\n" +
+                "CCACHE_COMPILERCHECK=\\\"%compiler% -v\\\"\n" +
+                "CCACHE_COMPRESS=\\\"true\\\"\n" +
+                "CCACHE_COMPRESSLEVEL=\\\"6\\\"\n" +
+                "CCACHE_TEMPDIR=\\\"/tmp/ccache-tmpfiles\\\"\"" +
+                ">> /etc/portage/make.conf")
+        else:
+            options.log.info("enabling ccache skipped, no directory specified")
 
     def _enable_test(self):
         """Enable test FEATURES for ATOM."""
@@ -326,4 +375,4 @@ class Docker:
         self.execute("if [[ -f /etc/portage/package.use/testbuild ]]; then " +
                      "cat /etc/portage/package.use/testbuild; fi")
         self.execute("emerge --info")
-        self.execute("qlop --list")
+        self.execute("qlop")

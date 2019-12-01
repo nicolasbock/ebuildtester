@@ -1,4 +1,3 @@
-from ebuildtester.atom import Atom
 from pkg_resources import get_distribution
 import argparse
 import multiprocessing
@@ -38,10 +37,14 @@ def parse_commandline(args):
         action="append",
         default=[])
     parser.add_argument(
+        "--ccache-dir",
+        help="Add ccache dir",
+        action="append",
+        default=[])
+    parser.add_argument(
         "--update",
         help="Update container before installing atom",
-        choices=["yes", "true", "no", "false"],
-        default="false")
+        action="store_true")
     parser.add_argument(
         "--threads",
         metavar="N",
@@ -77,6 +80,10 @@ def parse_commandline(args):
         help="Remove container after session is done",
         action="store_true")
     parser.add_argument(
+        "--pull",
+        help="Download latest 'gentoo/stage3-amd64' docker image",
+        action="store_true")
+    parser.add_argument(
         "--with-X",
         help="Globally enable the X USE flag",
         action="store_true")
@@ -87,31 +94,16 @@ def parse_commandline(args):
     parser.add_argument(
         "--profile",
         help="The profile to use",
-        choices=["default/linux/amd64/17.0",
-                 "default/linux/amd64/17.0/systemd"],
-        default="default/linux/amd64/17.0")
+        choices=["default/linux/amd64/17.1",
+                 "default/linux/amd64/17.1/systemd"],
+        default="default/linux/amd64/17.1")
+    parser.add_argument(
+        "--shell-env",
+        help="Set user shell env (Example: --shell-env \"EDITOR=/usr/bin/vi\")",
+        default=[],
+        nargs="+",
+        action="append")
 
     options = parser.parse_args(args)
-
-    if not options.manual and options.atom is None:
-        raise Exception("either specify an atom or use --manual")
-
-    if options.atom:
-        temp = []
-        for a in options.atom:
-            temp += a
-        options.atom = temp
-    else:
-        options.atom = []
-
-    if options.with_vnc:
-        options.atom += ["net-misc/tigervnc", "x11-wm/icewm"]
-
-    options.atom = list(map(Atom, options.atom))
-
-    if options.update in ["yes", "true"]:
-        options.update = True
-    else:
-        options.update = False
 
     return options

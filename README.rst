@@ -64,37 +64,44 @@ The command understands the following command line arguments:
 .. code-block:: bash
 
     usage: ebuildtester [-h] [--version] [--atom ATOM [ATOM ...]] [--live-ebuild]
-                             [--manual] --portage-dir PORTAGE_DIR
-                             [--overlay-dir OVERLAY_DIR] [--update {yes,true,no,false}]
-                             [--threads N] [--use USE [USE ...]]
-                             [--global-use GLOBAL_USE [GLOBAL_USE ...]] [--unmask ATOM]
-                             [--unstable] [--gcc-version VER] [--rm] [--with-X]
-                             [--with-vnc]
-                             [--profile {default/linux/amd64/17.0,default/linux/amd64/17.0/systemd}]
+	                    [--manual] --portage-dir PORTAGE_DIR
+	                    [--overlay-dir OVERLAY_DIR] [--ccache-dir CCACHE_DIR]
+	                    [--update] [--threads N] [--use USE [USE ...]]
+	                    [--global-use GLOBAL_USE [GLOBAL_USE ...]] [--unmask ATOM]
+	                    [--unstable] [--gcc-version VER] [--rm] [--pull]
+	                    [--with-X] [--with-vnc]
+	                    [--profile {default/linux/amd64/17.1,default/linux/amd64/17.1/systemd}]
+	                    [--shell-env SHELL_ENV [SHELL_ENV ...]]
 
-    A dockerized approach to test a Gentoo package within a clean stage3.
+	A dockerized approach to test a Gentoo package within a clean stage3.
 
-    optional arguments:
-      -h, --help            show this help message and exit
-      --version             show program's version number and exit
-      --atom ATOM [ATOM ...]
-                            The package atom(s) to install
-      --live-ebuild         Unmask the live ebuild of the atom
-      --manual              Install package manually
-      --portage-dir PORTAGE_DIR
-                            The local portage directory
-      --overlay-dir OVERLAY_DIR
-                            Add overlay dir (can be used multiple times)
-      --update {yes,true,no,false}
-                            Update container before installing atom
-      --threads N           Use N (default 8) threads to build packages
-      --use USE [USE ...]   The use flags for the atom
-      --global-use GLOBAL_USE [GLOBAL_USE ...]
-                            Set global USE flag
-      --unmask ATOM         Unmask atom (can be used multiple times)
-      --unstable            Globally 'unstable' system, i.e. ~amd64
-      --gcc-version VER     Use gcc version VER
-      --rm                  Remove container after session is done
-      --with-X              Globally enable the X USE flag
-      --with-vnc            Install VNC server to test graphical applications
-      --profile {default/linux/amd64/17.0,default/linux/amd64/17.0/systemd}
+	optional arguments:
+	  -h, --help            show this help message and exit
+	  --version             show program's version number and exit
+	  --atom ATOM [ATOM ...]
+	                        The package atom(s) to install
+	  --live-ebuild         Unmask the live ebuild of the atom
+	  --manual              Install package manually
+	  --portage-dir PORTAGE_DIR
+	                        The local portage directory
+	  --overlay-dir OVERLAY_DIR
+	                        Add overlay dir (can be used multiple times)
+	  --ccache-dir CCACHE_DIR
+	                        Add ccache dir
+	  --update              Update container before installing atom
+	  --threads N           Use N (default 6) threads to build packages
+	  --use USE [USE ...]   The use flags for the atom
+	  --global-use GLOBAL_USE [GLOBAL_USE ...]
+	                        Set global USE flag
+	  --unmask ATOM         Unmask atom (can be used multiple times)
+	  --unstable            Globally 'unstable' system, i.e. ~amd64
+	  --gcc-version VER     Use gcc version VER
+	  --rm                  Remove container after session is done
+	  --pull                Download latest 'gentoo/stage3-amd64' docker image
+	  --with-X              Globally enable the X USE flag
+	  --with-vnc            Install VNC server to test graphical applications
+	  --profile {default/linux/amd64/17.1,default/linux/amd64/17.1/systemd}
+	                        The profile to use
+	  --shell-env SHELL_ENV [SHELL_ENV ...]
+	                        Set user shell env (Example: --shell-env
+	                        "EDITOR=/usr/bin/vi")
