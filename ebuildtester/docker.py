@@ -213,6 +213,7 @@ class Docker:
                      ">> /etc/portage/make.conf")
         self.execute("echo EMERGE_DEFAULT_OPTS=\\\"--autounmask --autounmask-write --usepkg --oneshot\\\" " +
                      ">> /etc/portage/make.conf")
+        self.execute("echo CLEAN_DELAY=0 >> /etc/portage/make.conf")
         if options.options.unstable:
             self.execute("echo ACCEPT_KEYWORDS=\\\"~amd64\\\" " +
                          ">> /etc/portage/make.conf")
