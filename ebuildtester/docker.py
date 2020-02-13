@@ -23,6 +23,7 @@ class Docker:
         self._enable_overlays(repo_names)
         self._enable_ccache()
         self._enable_test()
+        self._mask()
         self._unmask_atom()
         self._unmask()
         self._update()
@@ -286,6 +287,15 @@ class Docker:
         else:
             options.log.info("enabling tests skipped, no atoms specified")
 
+    def _mask(self):
+        """Mask other atoms."""
+
+        options.log.info("masking additional atoms")
+        for a in options.options.mask:
+            options.log.info("  masking %s" % a)
+            self.execute("mkdir -p /etc/portage/package.mask")
+            self.execute("echo \"%s\" >> /etc/portage/package.mask/testbuild" % a)
+
     def _unmask_atom(self):
         """Unmask the atom to install."""
 
@@ -296,14 +306,13 @@ class Docker:
                     unmask_keyword = "**"
                 else:
                     unmask_keyword = "~amd64"
-                self.execute("mkdir -p /etc/portage/package.accept_keywords")
-                self.execute(
-                    "echo \"" + str(a) + "\" " + unmask_keyword + " >> " +
+                self.execute("mkdir -p /etc/portage/package.{accept_keywords,unmask}")
+                self.execute("echo \"%s\" >> /etc/portage/package.unmask/testbuild" % a)
+                self.execute("echo \"" + str(a) + "\" " + unmask_keyword + " >> " +
                     "/etc/portage/package.accept_keywords/testbuild")
             if len(options.options.use) > 0:
                 for a in options.options.atom:
-                    self.execute(
-                        "echo %s %s >> /etc/portage/package.use/testbuild" %
+                    self.execute("echo %s %s >> /etc/portage/package.use/testbuild" %
                         (str(a), " ".join(options.options.use)))
         else:
             options.log.info("no atoms to unmask")
@@ -314,10 +323,9 @@ class Docker:
         options.log.info("unmasking additional atoms")
         for a in options.options.unmask:
             options.log.info("  unmasking %s" % a)
-            self.execute("mkdir -p /etc/portage/package.accept_keywords")
-            self.execute(
-                "echo \"%s\" ~amd64 >> "
-                "/etc/portage/package.accept_keywords/testbuild" % a)
+            self.execute("mkdir -p /etc/portage/package.{accept_keywords,unmask}")
+            self.execute("echo \"%s\" >> /etc/portage/package.unmask/testbuild" % a)
+            self.execute("echo \"%s\" ~amd64 >> /etc/portage/package.accept_keywords/testbuild" % a)
 
     def _update(self):
         """Update container."""

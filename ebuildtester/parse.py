@@ -62,6 +62,12 @@ def parse_commandline(args):
         default=[],
         nargs="+")
     parser.add_argument(
+        "--mask",
+        metavar="ATOM",
+        help="Mask atom (can be used multiple times)",
+        default=[],
+        action="append")
+    parser.add_argument(
         "--unmask",
         metavar="ATOM",
         help="Unmask atom (can be used multiple times)",
