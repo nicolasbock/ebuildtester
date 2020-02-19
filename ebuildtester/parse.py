@@ -40,8 +40,7 @@ def parse_commandline(args):
     parser.add_argument(
         "--update",
         help="Update container before installing atom",
-        choices=["yes", "true", "no", "false"],
-        default="false")
+        action="store_true")
     parser.add_argument(
         "--threads",
         metavar="N",
@@ -77,6 +76,15 @@ def parse_commandline(args):
         help="Remove container after session is done",
         action="store_true")
     parser.add_argument(
+        "--pull",
+        help="Download latest 'gentoo/stage3-amd64' docker image",
+        action="store_true")
+    parser.add_argument(
+        "--storage-opt",
+        help="Storage driver options for all volumes (same as Docker param)",
+        nargs="+",
+        action="append")
+    parser.add_argument(
         "--with-X",
         help="Globally enable the X USE flag",
         action="store_true")
@@ -87,9 +95,9 @@ def parse_commandline(args):
     parser.add_argument(
         "--profile",
         help="The profile to use",
-        choices=["default/linux/amd64/17.0",
-                 "default/linux/amd64/17.0/systemd"],
-        default="default/linux/amd64/17.0")
+        choices=["default/linux/amd64/17.1",
+                 "default/linux/amd64/17.1/systemd"],
+        default="default/linux/amd64/17.1")
 
     options = parser.parse_args(args)
 
