@@ -136,11 +136,12 @@ class Docker:
     def _setup_container(self, docker_image):
         """Setup the container."""
 
-        import subprocess
+        if options.options.pull:
+            import subprocess
 
-        docker_args = ["docker", "pull", docker_image]
-        docker = subprocess.Popen(docker_args)
-        docker.wait()
+            docker_args = ["docker", "pull", docker_image]
+            docker = subprocess.Popen(docker_args)
+            docker.wait()
 
     def _create_container(self, docker_image, local_portage, overlays):
         """Create new container."""
@@ -152,17 +153,24 @@ class Docker:
             "--tty",
             "--cap-add", "SYS_ADMIN",
             "--device", "/dev/fuse",
-            "--storage-opt", "size=50G",
             "--workdir", "/root",
-            "--volume", "%s:/usr/portage" % local_portage,
-            "--volume", "/usr/portage/distfiles:/usr/portage/distfiles"]
+            "--volume", "%s:/var/db/repos/gentoo" % local_portage,
+            "--volume", "%s/distfiles:/var/cache/distfiles" % local_portage,
+            "--volume", "%s/packages:/var/cache/binpkgs" % local_portage]
+
+        if options.options.storage_opt:
+            for s in options.options.storage_opt:
+                docker_args += ["--storage-opt", "%s" % s]
+
         for o in overlays:
             docker_args += ["--volume=%s:%s" % o]
+
         docker_args += [docker_image]
         options.log.info("creating docker container with: %s" %
                          " ".join(docker_args))
         docker = subprocess.Popen(docker_args, stdout=subprocess.PIPE)
         docker.wait()
+
         if docker.returncode != 0:
             raise Exception("failure creating docker container")
 
@@ -326,4 +334,4 @@ class Docker:
         self.execute("if [[ -f /etc/portage/package.use/testbuild ]]; then " +
                      "cat /etc/portage/package.use/testbuild; fi")
         self.execute("emerge --info")
-        self.execute("qlop --list")
+        self.execute("qlop")

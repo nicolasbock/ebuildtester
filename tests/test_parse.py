@@ -37,8 +37,8 @@ class TestParse(unittest.TestCase):
 
     def test_update(self):
         options = ebuildtester.parse.parse_commandline(
-            self.args + ["--update", "yes"])
-        self.assertTrue(options.update)
+            self.args + ["--update"])
+        self.assertFalse(options.update)
 
     def test_threads(self):
         options = ebuildtester.parse.parse_commandline(
