@@ -1,3 +1,8 @@
+import os
+import re
+import sys
+import subprocess
+
 import ebuildtester.options as options
 from ebuildtester.utils import massage_string
 
@@ -11,12 +16,10 @@ class Docker:
     def __init__(self, local_portage, overlay_dirs):
         """Create a new container."""
 
-        import os.path
-
         docker_image = "gentoo/stage3-amd64"
-        overlay_dirs = list(set(overlay_dirs))
-        overlay_mountpoints = [os.path.join("/var/lib/overlays", p)
-                               for p in map(os.path.basename, overlay_dirs)]
+        repo_names = self._get_repo_names(overlay_dirs)
+        overlay_mountpoints = [os.path.join("/var/lib/overlays", r)
+                               for r in repo_names]
 
         self._setup_container(docker_image)
         self._create_container(docker_image, local_portage,
@@ -24,7 +27,7 @@ class Docker:
         self._start_container()
         self._set_profile()
         self._tweak_settings()
-        self._enable_overlays(map(os.path.basename, overlay_dirs))
+        self._enable_overlays(repo_names)
         self._enable_test()
         self._unmask_atom()
         self._unmask()
@@ -39,10 +42,6 @@ class Docker:
 
         cmd is a string which is executed within a bash shell.
         """
-
-        import os
-        import subprocess
-        import sys
 
         options.log.info("%s %s" % (self.cid[:6], cmd))
         docker_cmd = ["docker", "exec", "--interactive"]
@@ -94,8 +93,6 @@ class Docker:
     def shell(self):
         """Run an interactive shell in container."""
 
-        import subprocess
-
         options.log.info("running interactive shell in container")
         docker = subprocess.Popen(["docker", "exec", "--tty", "--interactive",
                                    self.cid, "/bin/bash"])
@@ -112,8 +109,6 @@ class Docker:
 
     def remove(self):
         """Remove the docker container."""
-
-        import subprocess
 
         options.log.info("stopping container")
         docker = subprocess.Popen(["docker", "kill", self.cid])
@@ -137,16 +132,12 @@ class Docker:
         """Setup the container."""
 
         if options.options.pull:
-            import subprocess
-
             docker_args = ["docker", "pull", docker_image]
             docker = subprocess.Popen(docker_args)
             docker.wait()
 
     def _create_container(self, docker_image, local_portage, overlays):
         """Create new container."""
-
-        import subprocess
 
         docker_args = [
             "docker", "create",
@@ -183,8 +174,6 @@ class Docker:
     def _start_container(self):
         """Start the container."""
 
-        import subprocess
-
         docker_args = ["docker", "start", "%s" % self.cid]
         docker = subprocess.Popen(docker_args, stdout=subprocess.PIPE)
         docker.wait()
@@ -216,17 +205,27 @@ class Docker:
         if options.options.with_X:
             self.execute("echo USE=\\\"X\\\" >> /etc/portage/make.conf")
 
-    def _enable_overlays(self, overlays):
+    def _get_repo_names(self, overlay_dirs):
+        """Get repo names from local overlay settings."""
+
+        repo_names = []
+        for o in overlay_dirs:
+            with open(os.path.join(o, "profiles/repo_name"), "r") as f:
+                for repo_name in f:
+                    repo_names.append(repo_name.replace("\n", ""))
+
+        return repo_names
+
+    def _enable_overlays(self, repo_names):
         """Enable overlays."""
 
-        self.execute("mkdir -p /etc/portage/repos.conf")
-        for o in overlays:
-            self.execute("echo \"[%s]\" >> "
-                         "/etc/portage/repos.conf/overlays.conf" % o)
-            self.execute("echo \"location = /var/lib/overlays/%s\" >> "
-                         "/etc/portage/repos.conf/overlays.conf" % o)
-            self.execute("echo \"master = gentoo\" >> "
-                         "/etc/portage/repos.conf/overlays.conf")
+        for r in repo_names:
+            self.execute(
+                "mkdir -p /etc/portage/repos.conf && " +
+                "echo -e \"[%s]\\n" % str(r) +
+                "location = /var/lib/overlays/%s\\n" % str(r) +
+                "master = gentoo\" >> /etc/portage/repos.conf/overlays.conf"
+            )
 
     def _enable_test(self):
         """Enable test FEATURES for ATOM."""
@@ -307,8 +306,6 @@ class Docker:
 
     def _set_gcc(self):
         """Set gcc in the container."""
-
-        import re
 
         options.log.info("setting gcc")
         if options.options.gcc_version:
