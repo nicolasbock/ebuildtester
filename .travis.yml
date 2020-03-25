@@ -30,5 +30,4 @@ deploy:
   skip_cleanup: false
   on:
     tags: true
-    python: "2.7"
     branch: master
