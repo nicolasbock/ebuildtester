@@ -42,4 +42,4 @@ def main():
         options.log.info("opening interactive shell")
         container.shell()
 
-        container.cleanup()
+    container.cleanup()

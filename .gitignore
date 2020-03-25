@@ -1,0 +1,4 @@
+build/
+dist/
+ebuildtester.egg-info/
+*__pycache__*
