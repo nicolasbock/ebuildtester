@@ -30,4 +30,5 @@ deploy:
   skip_cleanup: false
   on:
     tags: true
+    python: "3.6"
     branch: master
