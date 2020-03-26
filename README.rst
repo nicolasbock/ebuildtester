@@ -15,6 +15,7 @@ current) stage3 Docker container.
    :target: http://ebuildtester.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status
 
+.. image:: https://github.com/nicolasbock/ebuildtester/workflows/build/badge.svg
 
 Requirements
 ------------
