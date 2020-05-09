@@ -1,0 +1,49 @@
+name: build
+on:
+  release:
+    types: [created]
+  pull_request:
+    branches:
+      - master
+  push:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.6', '3.7', '3.8']
+    name: Python ${{ matrix.python-version }} build
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Build and test
+      run: |
+        bandit ebuildtester
+        pycodestyle ebuildtester
+        python setup.py build
+        python setup.py test
+        python setup.py install
+    - name: Build docs
+      run: |
+        sphinx-apidoc --force --output-dir docs ebuildtester
+        sphinx-build -M doctest docs docs/_build
+        sphinx-build -M linkcheck docs docs/_build
+        sphinx-build -M coverage docs docs/_build
+        sphinx-build -M html docs docs/_build
+        sphinx-build -M man docs docs/_build
+    - name: Publish
+      if: matrix.python-version == '3.6' && github.event_name == 'release'
+      env:
+        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      run: |
+        pip install setuptools wheel twine
+        python setup.py sdist bdist_wheel
+        twine upload dist/*
