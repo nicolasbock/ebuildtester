@@ -143,6 +143,8 @@ class Docker:
             "docker", "create",
             "--tty",
             "--cap-add", "SYS_ADMIN",
+            # https://github.com/moby/moby/issues/16429
+            "--security-opt", "apparmor:unconfined",
             "--device", "/dev/fuse",
             "--workdir", "/root",
             "--volume", "%s:/var/db/repos/gentoo" % local_portage,
