@@ -204,6 +204,11 @@ class Docker:
                          ">> /etc/portage/make.conf")
         if options.options.with_X:
             self.execute("echo USE=\\\"X\\\" >> /etc/portage/make.conf")
+        if options.options.python_single_target:
+            self.execute(("echo */* PYTHON_SINGLE_TARGET: %s" %
+                          (options.options.python_single_target)) +
+                         " >> /etc/portage/package.use/python")
+
 
     def _get_repo_names(self, overlay_dirs):
         """Get repo names from local overlay settings."""
