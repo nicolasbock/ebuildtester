@@ -208,7 +208,10 @@ class Docker:
             self.execute(("echo */* PYTHON_SINGLE_TARGET: %s" %
                           (options.options.python_single_target)) +
                          " >> /etc/portage/package.use/python")
-
+        if options.options.python_targets:
+            self.execute(("echo */* PYTHON_TARGETS: %s" %
+                          (options.options.python_targets)) +
+                         " >> /etc/portage/package.use/python")
 
     def _get_repo_names(self, overlay_dirs):
         """Get repo names from local overlay settings."""

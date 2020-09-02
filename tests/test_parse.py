@@ -67,6 +67,11 @@ class TestParse(unittest.TestCase):
             self.args + ["--python-single-target", "-* python3_8"])
         self.assertEqual("-* python3_8", options.python_single_target)
 
+    def test_python_targets(self):
+        options = ebuildtester.parse.parse_commandline(
+            self.args + ["--python-targets", "python3_8"])
+        self.assertEqual("python3_8", options.python_targets)
+
     def test_with_vnc(self):
         options = ebuildtester.parse.parse_commandline(
             self.args + ["--with-vnc"])

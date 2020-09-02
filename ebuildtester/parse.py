@@ -76,6 +76,10 @@ def parse_commandline(args):
         metavar="PYTHON_SINGLE_TARGET",
         help="Specify a PYTHON_SINGLE_TARGET")
     parser.add_argument(
+        "--python-targets",
+        metavar="PYTHON_TARGETS",
+        help="Specify a PYTHON_TARGETS")
+    parser.add_argument(
         "--rm",
         help="Remove container after session is done",
         action="store_true")

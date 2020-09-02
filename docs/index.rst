@@ -73,7 +73,7 @@ The command understands the following command line arguments:
                              [--overlay-dir OVERLAY_DIR] [--update {yes,true,no,false}]
                              [--threads N] [--use USE [USE ...]]
                              [--global-use GLOBAL_USE [GLOBAL_USE ...]] [--unmask ATOM]
-                             [ --python-single-target VAR ]
+                             [ --python-single-target VAR ] [ --python-targets VAR ]
                              [--unstable] [--gcc-version VER] [--rm] [--with-X]
                              [--with-vnc]
                              [--profile {default/linux/amd64/17.0,default/linux/amd64/17.0/systemd}]
@@ -101,6 +101,7 @@ The command understands the following command line arguments:
       --unstable            Globally 'unstable' system, i.e. ~amd64
       --gcc-version VER     Use gcc version VER
       --python-single-target  Define a PYTHON_SINGLE_TARGET variable
+      --python-targets        Define a PYTHON_TARGETS variable
       --rm                  Remove container after session is done
       --with-X              Globally enable the X USE flag
       --with-vnc            Install VNC server to test graphical applications
