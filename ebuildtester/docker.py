@@ -88,7 +88,7 @@ class Docker:
 
         if docker.returncode != 0:
             options.log.error("running in container %s" % (str(self.cid)))
-            raise ExecuteFailure("failed command \"%s\"" % (cmd))
+            options.log.error("failed command \"%s\"" % (cmd))
 
     def shell(self):
         """Run an interactive shell in container."""
