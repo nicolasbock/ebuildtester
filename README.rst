@@ -17,6 +17,10 @@ current) stage3 Docker container.
 
 .. image:: https://github.com/nicolasbock/ebuildtester/workflows/build/badge.svg
 
+.. image:: https://badges.gitter.im/ebuildtester/community.svg
+   :target: https://gitter.im/ebuildtester/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
+   :alt: Gitter
+
 Requirements
 ------------
 
