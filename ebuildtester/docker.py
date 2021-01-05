@@ -298,10 +298,13 @@ class Docker:
     def _install_basics(self):
         """Install some basic packages."""
 
-        options.log.info("installing basic packages: %s" %
-                         options.base_packages)
-        self.execute("emerge --verbose %s" %
-                     " ".join(map(str, options.base_packages)))
+        if not options.options.install_basic_packages:
+            options.log.info("skipping basic packages")
+        else:
+            options.log.info("installing basic packages: %s" %
+                             options.base_packages)
+            self.execute("emerge --verbose %s" %
+                         " ".join(map(str, options.base_packages)))
 
     def _enable_global_use(self):
         """Enable global USE settings."""
