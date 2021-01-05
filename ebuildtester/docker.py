@@ -142,7 +142,9 @@ class Docker:
         docker_args = [
             "docker", "create",
             "--tty",
-            "--cap-add", "SYS_ADMIN",
+            "--cap-add", "CAP_SYS_ADMIN",
+            "--cap-add", "CAP_MKNOD",
+            "--cap-add", "CAP_NET_ADMIN",
             # https://github.com/moby/moby/issues/16429
             "--security-opt", "apparmor:unconfined",
             "--device", "/dev/fuse",
