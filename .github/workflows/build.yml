@@ -1,4 +1,5 @@
 name: build
+
 on:
   release:
     types: [created]
@@ -6,12 +7,14 @@ on:
     branches:
       - master
   push:
+
 jobs:
+
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.6', '3.7', '3.8']
+        python-version: ['3.6', '3.7', '3.8', '3.9']
     name: Python ${{ matrix.python-version }} build
     steps:
     - uses: actions/checkout@v2
