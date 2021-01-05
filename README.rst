@@ -1,10 +1,6 @@
 Introduction
 ============
 
-.. image:: https://badges.gitter.im/ebuildtester/ebuildtester.svg
-   :alt: Join the chat at https://gitter.im/ebuildtester/ebuildtester
-   :target: https://gitter.im/ebuildtester/ebuildtester?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
-
 This script is a tool to test a Gentoo ebuild and its
 dependencies. The idea is that the package is emerged in a clean (and
 current) stage3 Docker container.
@@ -20,6 +16,10 @@ current) stage3 Docker container.
    :alt: Documentation Status
 
 .. image:: https://github.com/nicolasbock/ebuildtester/workflows/build/badge.svg
+
+.. image:: https://badges.gitter.im/ebuildtester/ebuildtester.svg
+   :alt: Join the chat at https://gitter.im/ebuildtester/ebuildtester
+   :target: https://gitter.im/ebuildtester/ebuildtester?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 
 Requirements
 ------------
