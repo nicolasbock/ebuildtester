@@ -16,6 +16,8 @@ current) stage3 Docker container.
    :alt: Documentation Status
 
 .. image:: https://github.com/nicolasbock/ebuildtester/workflows/build/badge.svg
+   :target: https://github.com/nicolasbock/ebuildtester/actions?query=workflow%3Abuild
+   :alt: GitHub Actions
 
 .. image:: https://badges.gitter.im/ebuildtester/ebuildtester.svg
    :alt: Join the chat at https://gitter.im/ebuildtester/ebuildtester
