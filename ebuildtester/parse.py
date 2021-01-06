@@ -42,6 +42,10 @@ def parse_commandline(args):
         help="Update container before installing atom",
         action="store_true")
     parser.add_argument(
+        "--install-basic-packages",
+        help="Install basic packages after container starts",
+        action="store_true")
+    parser.add_argument(
         "--threads",
         metavar="N",
         help="Use N (default %(default)s) threads to build packages",
