@@ -56,6 +56,9 @@ jobs:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
+        python setup.py --version
+        git log --oneline --decorate --color | head -n 20
         pip install setuptools wheel twine
+        rm -rf dist
         python setup.py sdist bdist_wheel
         twine upload dist/*
