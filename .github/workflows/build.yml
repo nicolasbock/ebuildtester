@@ -42,7 +42,7 @@ jobs:
         sphinx-build -M html docs docs/_build
         sphinx-build -M man docs docs/_build
     - name: Publish
-      if: matrix.python-version == '3.6' && github.event_name == 'release'
+      if: matrix.python-version == '3.9' && github.event_name == 'release'
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
