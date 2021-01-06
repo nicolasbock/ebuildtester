@@ -20,6 +20,9 @@ def parse_commandline(args):
         nargs="+",
         action="append")
     parser.add_argument(
+        "--binhost",
+        help="Binhost URI")
+    parser.add_argument(
         "--live-ebuild",
         help="Unmask the live ebuild of the atom",
         action="store_true")

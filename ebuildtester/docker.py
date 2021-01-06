@@ -196,13 +196,23 @@ class Docker:
 
         options.log.info("tweaking portage settings")
 
+        features = "-sandbox -usersandbox"
+
+        if options.options.binhost:
+            features += " getbinpkg"
+
         # Disable the usersandbox feature, it's not working well inside a
         # docker container.
-        self.execute("echo FEATURES=\\\"-sandbox -usersandbox\\\" " +
-                     ">> /etc/portage/make.conf")
+        self.execute("echo FEATURES=\\\"{}\\\" "
+                     ">> /etc/portage/make.conf".format(features))
+
         self.execute(("echo MAKEOPTS=\\\"-j%d\\\" " %
                       (options.options.threads)) +
                      ">> /etc/portage/make.conf")
+        if options.options.binhost:
+            self.execute("echo PORTAGE_BINHOST=\\\"{}\\\""
+                         ">> /etc/portage/make.conf"
+                         .format(options.options.binhost))
         if options.options.unstable:
             self.execute("echo ACCEPT_KEYWORDS=\\\"~amd64\\\" " +
                          ">> /etc/portage/make.conf")
