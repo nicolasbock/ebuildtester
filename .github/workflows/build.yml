@@ -31,6 +31,10 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+    - name: Get version
+      run: |
+        python setup.py --version
+        git log --oneline --decorate --color | head -n 20
     - name: Build and test
       run: |
         bandit ebuildtester
