@@ -1,0 +1,33 @@
+---
+
+name: Publish
+
+on:
+  release:
+    types: [created]
+
+jobs:
+
+  publish:
+    runs-on: ubuntu-latest
+    name: Publish PyPI Package
+    steps:
+    - name: Check out sources
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Set up Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.9'
+    - name: Publish PyPI Package
+      env:
+        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      run: |
+        python setup.py --version
+        git log --oneline --decorate --color | head -n 20
+        pip install setuptools wheel twine
+        rm -rf dist
+        python setup.py sdist bdist_wheel
+        twine upload dist/*
