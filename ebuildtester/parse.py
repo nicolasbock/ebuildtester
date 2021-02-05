@@ -113,6 +113,10 @@ def parse_commandline(args):
         choices=["default/linux/amd64/17.1",
                  "default/linux/amd64/17.1/systemd"],
         default="default/linux/amd64/17.1")
+    parser.add_argument(
+        "--docker-image",
+        help="Specify the docker image to use (default = %(default)s)",
+        default="gentoo/stage3-amd64")
 
     options = parser.parse_args(args)
 
