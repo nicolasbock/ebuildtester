@@ -1,8 +1,6 @@
 name: build
 
 on:
-  release:
-    types: [created]
   pull_request:
     branches:
       - master
@@ -50,15 +48,3 @@ jobs:
         sphinx-build -M coverage docs docs/_build
         sphinx-build -M html docs docs/_build
         sphinx-build -M man docs docs/_build
-    - name: Publish
-      if: matrix.python-version == '3.9' && github.event_name == 'release'
-      env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run: |
-        python setup.py --version
-        git log --oneline --decorate --color | head -n 20
-        pip install setuptools wheel twine
-        rm -rf dist
-        python setup.py sdist bdist_wheel
-        twine upload dist/*
