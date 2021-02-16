@@ -17,34 +17,52 @@ jobs:
         python-version: ['3.6', '3.7', '3.8', '3.9']
     name: Python ${{ matrix.python-version }} build
     steps:
+
+    - name: Get tox environment
+      run: |
+        tox_environment="py${python_version/./}"
+        echo "tox_environment=${tox_environment}" >> $GITHUB_ENV
+      env:
+        python_version: ${{ matrix.python-version }}
+
     - name: Check out sources
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
+
     - name: Set up Python
       uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-    - name: Get version
-      run: |
-        python setup.py --version
-        git log --oneline --decorate --color | head -n 20
-    - name: Build and test
-      run: |
-        bandit ebuildtester
-        pycodestyle ebuildtester
-        python setup.py build
-        python setup.py test
-        python setup.py install
+
+    - name: Install tox
+      run: sudo apt install --yes tox
+
+    - name: Test
+      run: tox -e ${{ env.tox_environment }}
+
+    - name: Archive test results
+      uses: actions/upload-artifact@v2
+      with:
+        name: test log (${{ env.tox_environment }})
+        path: .tox/${{ env.tox_environment }}/log
+      if: failure()
+
+    - name: Bandit
+      run: tox -e bandit
+      if: ${{ matrix.python-version == '3.9' }}
+
+    - name: Archive bandit results
+      uses: actions/upload-artifact@v2
+      with:
+        name: bandit log
+        path: .tox/bandit/log
+      if: ${{ matrix.python-version == '3.9' && failure() }}
+
+    - name: Pep8
+      run: tox -e pep8
+      if: ${{ matrix.python-version == '3.9' }}
+
     - name: Build docs
-      run: |
-        sphinx-apidoc --force --output-dir docs ebuildtester
-        sphinx-build -M doctest docs docs/_build
-        sphinx-build -M linkcheck docs docs/_build
-        sphinx-build -M coverage docs docs/_build
-        sphinx-build -M html docs docs/_build
-        sphinx-build -M man docs docs/_build
+      run: tox -e docs
+      if: ${{ matrix.python-version == '3.9' }}
