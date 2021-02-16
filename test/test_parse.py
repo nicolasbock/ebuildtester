@@ -86,3 +86,8 @@ class TestParse(unittest.TestCase):
         self.assertTrue(options.with_vnc)
         self.assertTrue(Atom("net-misc/tigervnc") in options.atom)
         self.assertTrue(Atom("x11-wm/icewm") in options.atom)
+
+    def test_docker_image(self):
+        options = ebuildtester.parse.parse_commandline(
+            self.args + ["--manual"])
+        self.assertEqual(options.docker_image, "gentoo/stage3-amd64")
