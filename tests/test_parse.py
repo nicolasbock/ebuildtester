@@ -13,6 +13,11 @@ class TestParse(unittest.TestCase):
             self.args + ["--atom", "=SECTION/ATOM-1.0.0"])
         self.assertTrue(Atom("=SECTION/ATOM-1.0.0") in options.atom)
 
+    def test_binhost(self):
+        options = ebuildtester.parse.parse_commandline(
+            self.args + ["--manual", "--binhost", "http://localhost:8080"])
+        self.assertIn("http://localhost:8080", options.binhost)
+
     def test_live_ebuild(self):
         options = ebuildtester.parse.parse_commandline(
             self.args + ["--manual", "--live-ebuild"])
