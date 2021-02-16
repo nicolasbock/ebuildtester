@@ -41,11 +41,28 @@ jobs:
     - name: Test
       run: tox -e ${{ env.tox_environment }}
 
+    - name: Archive test results
+      uses: actions/upload-artifact@v2
+      with:
+        name: test log (${{ env.tox_environment }})
+        path: .tox/${{ env.tox_environment }}/log
+      if: failure()
+
     - name: Bandit
       run: tox -e bandit
+      if: ${{ matrix.python-version == '3.9' }}
+
+    - name: Archive bandit results
+      uses: actions/upload-artifact@v2
+      with:
+        name: bandit log
+        path: .tox/bandit/log
+      if: ${{ matrix.python-version == '3.9' && failure() }}
 
     - name: Pep8
       run: tox -e pep8
+      if: ${{ matrix.python-version == '3.9' }}
 
     - name: Build docs
       run: tox -e docs
+      if: ${{ matrix.python-version == '3.9' }}
