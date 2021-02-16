@@ -16,7 +16,7 @@ class Docker:
     def __init__(self, local_portage, overlay_dirs):
         """Create a new container."""
 
-        docker_image = "gentoo/stage3-amd64"
+        docker_image = options.options.docker_image
         repo_names = self._get_repo_names(overlay_dirs)
         overlay_mountpoints = [os.path.join("/var/lib/overlays", r)
                                for r in repo_names]
