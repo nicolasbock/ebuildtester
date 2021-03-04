@@ -110,8 +110,6 @@ def parse_commandline(args):
     parser.add_argument(
         "--profile",
         help="The profile to use (default = %(default)s)",
-        choices=["default/linux/amd64/17.1",
-                 "default/linux/amd64/17.1/systemd"],
         default="default/linux/amd64/17.1")
     parser.add_argument(
         "--docker-image",
