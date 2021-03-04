@@ -70,43 +70,51 @@ The command understands the following command line arguments:
 
 .. code-block:: bash
 
-    usage: ebuildtester [-h] [--version] [--atom ATOM [ATOM ...]] [--live-ebuild] [--manual] --portage-dir PORTAGE_DIR [--overlay-dir OVERLAY_DIR] [--update] [--install-basic-packages] [--threads N]
-                        [--use USE [USE ...]] [--global-use GLOBAL_USE [GLOBAL_USE ...]] [--unmask ATOM] [--unstable] [--gcc-version VER] [--python-single-target PYTHON_SINGLE_TARGET]
-                        [--python-targets PYTHON_TARGETS] [--rm] [--pull] [--storage-opt STORAGE_OPT [STORAGE_OPT ...]] [--with-X] [--with-vnc]
-                        [--profile {default/linux/amd64/17.1,default/linux/amd64/17.1/systemd}]
+   usage: ebuildtester [-h] [--version] [--atom ATOM [ATOM ...]] [--binhost BINHOST] [--live-ebuild]
+                       [--manual] --portage-dir PORTAGE_DIR [--overlay-dir OVERLAY_DIR] [--update]
+                       [--install-basic-packages] [--threads N] [--use USE [USE ...]]
+                       [--global-use GLOBAL_USE [GLOBAL_USE ...]] [--unmask ATOM] [--unstable]
+                       [--gcc-version VER] [--python-single-target PYTHON_SINGLE_TARGET]
+                       [--python-targets PYTHON_TARGETS] [--rm] [--pull]
+                       [--storage-opt STORAGE_OPT [STORAGE_OPT ...]] [--with-X] [--with-vnc]
+                       [--profile {default/linux/amd64/17.1,default/linux/amd64/17.1/systemd}]
+                       [--docker-image DOCKER_IMAGE]
 
-    A dockerized approach to test a Gentoo package within a clean stage3.
+   A dockerized approach to test a Gentoo package within a clean stage3.
 
-    optional arguments:
-      -h, --help            show this help message and exit
-      --version             show program's version number and exit
-      --atom ATOM [ATOM ...]
-                            The package atom(s) to install
-      --live-ebuild         Unmask the live ebuild of the atom
-      --manual              Install package manually
-      --portage-dir PORTAGE_DIR
-                            The local portage directory
-      --overlay-dir OVERLAY_DIR
-                            Add overlay dir (can be used multiple times)
-      --update              Update container before installing atom
-      --install-basic-packages
-                            Install basic packages after container starts
-      --threads N           Use N (default 8) threads to build packages
-      --use USE [USE ...]   The use flags for the atom
-      --global-use GLOBAL_USE [GLOBAL_USE ...]
-                            Set global USE flag
-      --unmask ATOM         Unmask atom (can be used multiple times)
-      --unstable            Globally 'unstable' system, i.e. ~amd64
-      --gcc-version VER     Use gcc version VER
-      --python-single-target PYTHON_SINGLE_TARGET
-                            Specify a PYTHON_SINGLE_TARGET
-      --python-targets PYTHON_TARGETS
-                            Specify a PYTHON_TARGETS
-      --rm                  Remove container after session is done
-      --pull                Download latest 'gentoo/stage3-amd64' docker image
-      --storage-opt STORAGE_OPT [STORAGE_OPT ...]
-                            Storage driver options for all volumes (same as Docker param)
-      --with-X              Globally enable the X USE flag
-      --with-vnc            Install VNC server to test graphical applications
-      --profile {default/linux/amd64/17.1,default/linux/amd64/17.1/systemd}
-                            The profile to use
+   optional arguments:
+     -h, --help            show this help message and exit
+     --version             show program's version number and exit
+     --atom ATOM [ATOM ...]
+                           The package atom(s) to install
+     --binhost BINHOST     Binhost URI
+     --live-ebuild         Unmask the live ebuild of the atom
+     --manual              Install package manually
+     --portage-dir PORTAGE_DIR
+                           The local portage directory
+     --overlay-dir OVERLAY_DIR
+                           Add overlay dir (can be used multiple times)
+     --update              Update container before installing atom
+     --install-basic-packages
+                           Install basic packages after container starts
+     --threads N           Use N (default 8) threads to build packages
+     --use USE [USE ...]   The use flags for the atom
+     --global-use GLOBAL_USE [GLOBAL_USE ...]
+                           Set global USE flag
+     --unmask ATOM         Unmask atom (can be used multiple times)
+     --unstable            Globally 'unstable' system, i.e. ~amd64
+     --gcc-version VER     Use gcc version VER
+     --python-single-target PYTHON_SINGLE_TARGET
+                           Specify a PYTHON_SINGLE_TARGET
+     --python-targets PYTHON_TARGETS
+                           Specify a PYTHON_TARGETS
+     --rm                  Remove container after session is done
+     --pull                Download latest 'gentoo/stage3-amd64' docker image
+     --storage-opt STORAGE_OPT [STORAGE_OPT ...]
+                           Storage driver options for all volumes (same as Docker param)
+     --with-X              Globally enable the X USE flag
+     --with-vnc            Install VNC server to test graphical applications
+     --profile {default/linux/amd64/17.1,default/linux/amd64/17.1/systemd}
+                           The profile to use (default = default/linux/amd64/17.1)
+     --docker-image DOCKER_IMAGE
+                           Specify the docker image to use (default = gentoo/stage3-amd64)
