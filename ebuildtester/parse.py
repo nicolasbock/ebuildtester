@@ -91,10 +91,6 @@ def parse_commandline(args):
         help="Remove container after session is done",
         action="store_true")
     parser.add_argument(
-        "--pull",
-        help="Download latest 'gentoo/stage3-amd64' docker image",
-        action="store_true")
-    parser.add_argument(
         "--storage-opt",
         help="Storage driver options for all volumes (same as Docker param)",
         nargs="+",
@@ -114,7 +110,11 @@ def parse_commandline(args):
     parser.add_argument(
         "--docker-image",
         help="Specify the docker image to use (default = %(default)s)",
-        default="gentoo/stage3-amd64")
+        default="gentoo/stage3")
+    parser.add_argument(
+        "--pull",
+        help="Download latest docker image",
+        action="store_true")
 
     options = parser.parse_args(args)
 

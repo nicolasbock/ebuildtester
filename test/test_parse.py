@@ -90,4 +90,4 @@ class TestParse(unittest.TestCase):
     def test_docker_image(self):
         options = ebuildtester.parse.parse_commandline(
             self.args + ["--manual"])
-        self.assertEqual(options.docker_image, "gentoo/stage3-amd64")
+        self.assertEqual(options.docker_image, "gentoo/stage3")
