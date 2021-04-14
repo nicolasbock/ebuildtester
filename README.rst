@@ -75,10 +75,9 @@ The command understands the following command line arguments:
                        [--install-basic-packages] [--threads N] [--use USE [USE ...]]
                        [--global-use GLOBAL_USE [GLOBAL_USE ...]] [--unmask ATOM] [--unstable]
                        [--gcc-version VER] [--python-single-target PYTHON_SINGLE_TARGET]
-                       [--python-targets PYTHON_TARGETS] [--rm] [--pull]
+                       [--python-targets PYTHON_TARGETS] [--rm]
                        [--storage-opt STORAGE_OPT [STORAGE_OPT ...]] [--with-X] [--with-vnc]
-                       [--profile {default/linux/amd64/17.1,default/linux/amd64/17.1/systemd}]
-                       [--docker-image DOCKER_IMAGE]
+                       [--profile PROFILE] [--docker-image DOCKER_IMAGE] [--pull]
 
    A dockerized approach to test a Gentoo package within a clean stage3.
 
@@ -109,12 +108,11 @@ The command understands the following command line arguments:
      --python-targets PYTHON_TARGETS
                            Specify a PYTHON_TARGETS
      --rm                  Remove container after session is done
-     --pull                Download latest 'gentoo/stage3-amd64' docker image
      --storage-opt STORAGE_OPT [STORAGE_OPT ...]
                            Storage driver options for all volumes (same as Docker param)
      --with-X              Globally enable the X USE flag
      --with-vnc            Install VNC server to test graphical applications
-     --profile {default/linux/amd64/17.1,default/linux/amd64/17.1/systemd}
-                           The profile to use (default = default/linux/amd64/17.1)
+     --profile PROFILE     The profile to use (default = default/linux/amd64/17.1)
      --docker-image DOCKER_IMAGE
-                           Specify the docker image to use (default = gentoo/stage3-amd64)
+                           Specify the docker image to use (default = gentoo/stage3)
+     --pull                Download latest docker image
