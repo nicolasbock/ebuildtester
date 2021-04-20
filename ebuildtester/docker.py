@@ -26,6 +26,7 @@ class Docker:
                                zip(overlay_dirs, overlay_mountpoints))
         self._start_container()
         self._set_profile()
+        self._enable_global_use()
         self._tweak_settings()
         self._enable_overlays(repo_names)
         self._enable_test()
@@ -33,7 +34,6 @@ class Docker:
         self._unmask()
         self._update()
         self._install_basics()
-        self._enable_global_use()
         self._set_gcc()
         self._print_summary()
 
@@ -217,7 +217,8 @@ class Docker:
             self.execute("echo ACCEPT_KEYWORDS=\\\"~amd64\\\" " +
                          ">> /etc/portage/make.conf")
         if options.options.with_X:
-            self.execute("echo USE=\\\"X\\\" >> /etc/portage/make.conf")
+            self.execute("emerge --verbose gentoolkit")
+            self.execute("euse --enable X")
         if options.options.python_single_target:
             self.execute(("echo */* PYTHON_SINGLE_TARGET: %s" %
                           (options.options.python_single_target)) +
@@ -326,6 +327,7 @@ class Docker:
             options.log.info("no global USE flags given, skipping")
         else:
             options.log.info("setting global USE flags")
+            self.execute("emerge --verbose gentoolkit")
             for u in options.options.global_use:
                 self.execute("euse --enable %s" % u)
 
