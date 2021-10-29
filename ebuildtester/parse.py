@@ -20,6 +20,11 @@ def parse_commandline(args):
         nargs="+",
         action="append")
     parser.add_argument(
+        "--refresh-manifest",
+        help="Refresh the package manifest before installing",
+        action="store_true"
+    )
+    parser.add_argument(
         "--binhost",
         help="Binhost URI")
     parser.add_argument(
