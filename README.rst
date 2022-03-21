@@ -5,9 +5,6 @@ This script is a tool to test a Gentoo ebuild and its
 dependencies. The idea is that the package is emerged in a clean (and
 current) stage3 Docker container.
 
-.. image:: https://travis-ci.org/nicolasbock/ebuildtester.svg?branch=master
-    :target: https://travis-ci.org/nicolasbock/ebuildtester
-
 .. image:: https://badge.fury.io/py/ebuildtester.svg
     :target: https://badge.fury.io/py/ebuildtester
 
