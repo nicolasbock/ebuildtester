@@ -9,9 +9,22 @@ description: |
 grade: stable
 confinement: strict
 
+environment:
+  DOCKER_COMMAND: docker-wrapper.sh
+
+plugs:
+  docker-executables:
+    interface: content
+    target: $SNAP/docker-snap
+    default-provider: docker
+
 apps:
   ebuildtester:
     command: bin/ebuildtester
+  confinement:
+    command: usr/bin/confinement.sh
+  docker:
+    command: usr/bin/docker-wrapper.sh
     plugs:
       - docker
 
@@ -23,3 +36,9 @@ parts:
     source-tag: v0.1.30
     requirements:
       - requirements.txt
+  docker-wrapper:
+    plugin: dump
+    source: .
+    organize:
+      confinement.sh: usr/bin/confinement.sh
+      docker-wrapper.sh: /usr/bin/docker-wrapper.sh

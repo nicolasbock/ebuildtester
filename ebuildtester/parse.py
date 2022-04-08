@@ -1,4 +1,5 @@
 from ebuildtester.atom import Atom
+import os
 from pkg_resources import get_distribution
 import argparse
 import multiprocessing
@@ -112,6 +113,9 @@ def parse_commandline(args):
         help="Specify the docker image to use (default = %(default)s)",
         default="gentoo/stage3")
     parser.add_argument(
+        "--docker-command",
+        help="Specify the docker command")
+    parser.add_argument(
         "--pull",
         help="Download latest docker image",
         action="store_true")
@@ -138,5 +142,8 @@ def parse_commandline(args):
         options.update = True
     else:
         options.update = False
+
+    if not options.docker_command:
+        options.docker_command = os.getenv('DOCKER_COMMAND', default='docker')
 
     return options
