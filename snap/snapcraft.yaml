@@ -1,6 +1,6 @@
 name: ebuildtester
 base: core20
-version: '0.1.31'
+adopt-info: ebuildtester
 summary: Tool to test a Gentoo ebuild and its dependencies
 description: |
     This script is a tool to test a Gentoo ebuild and its dependencies. The
@@ -31,7 +31,10 @@ parts:
     plugin: python
     source: https://github.com/nicolasbock/ebuildtester.git
     source-type: git
-    source-tag: v0.1.31
+    source-branch: main
+    override-pull: |
+      snapcraftctl pull
+      snapcraftctl set-version "$(git describe)"
     requirements:
       - requirements.txt
   docker-wrapper:
