@@ -1,6 +1,6 @@
 name: ebuildtester
 base: core20
-version: '0.1.30'
+version: '0.1.31'
 summary: Tool to test a Gentoo ebuild and its dependencies
 description: |
     This script is a tool to test a Gentoo ebuild and its dependencies. The
@@ -21,8 +21,6 @@ plugs:
 apps:
   ebuildtester:
     command: bin/ebuildtester
-  confinement:
-    command: usr/bin/confinement.sh
   docker:
     command: usr/bin/docker-wrapper.sh
     plugs:
@@ -33,12 +31,11 @@ parts:
     plugin: python
     source: https://github.com/nicolasbock/ebuildtester.git
     source-type: git
-    source-tag: v0.1.30
+    source-tag: v0.1.31
     requirements:
       - requirements.txt
   docker-wrapper:
     plugin: dump
     source: .
     organize:
-      confinement.sh: usr/bin/confinement.sh
       docker-wrapper.sh: /usr/bin/docker-wrapper.sh
