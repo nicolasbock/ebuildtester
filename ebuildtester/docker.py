@@ -94,7 +94,8 @@ class Docker:
         """Run an interactive shell in container."""
 
         options.log.info("running interactive shell in container")
-        docker = subprocess.Popen(["docker", "exec", "--tty", "--interactive",
+        docker = subprocess.Popen([options.options.docker_command,
+                                   "exec", "--tty", "--interactive",
                                    self.cid, "/bin/bash"])
         try:
             docker.wait()
@@ -111,10 +112,12 @@ class Docker:
         """Remove the docker container."""
 
         options.log.info("stopping container")
-        docker = subprocess.Popen(["docker", "kill", self.cid])
+        docker = subprocess.Popen([options.options.docker_command,
+                                   "kill", self.cid])
         docker.wait()
         options.log.info("deleting container")
-        docker = subprocess.Popen(["docker", "rm", self.cid])
+        docker = subprocess.Popen([options.options.docker_command,
+                                   "rm", self.cid])
         docker.wait()
 
     def _reader(self, proc, stream, name):
@@ -132,7 +135,8 @@ class Docker:
         """Setup the container."""
 
         if options.options.pull:
-            docker_args = ["docker", "pull", docker_image]
+            docker_args = [options.options.docker_command,
+                           "pull", docker_image]
             docker = subprocess.Popen(docker_args)
             docker.wait()
 
@@ -140,7 +144,7 @@ class Docker:
         """Create new container."""
 
         docker_args = [
-            "docker", "create",
+            options.options.docker_command, "create",
             "--tty",
             "--cap-add", "CAP_SYS_ADMIN",
             "--cap-add", "CAP_MKNOD",
@@ -178,7 +182,8 @@ class Docker:
     def _start_container(self):
         """Start the container."""
 
-        docker_args = ["docker", "start", "%s" % self.cid]
+        docker_args = [options.options.docker_command,
+                       "start", "%s" % self.cid]
         docker = subprocess.Popen(docker_args, stdout=subprocess.PIPE)
         docker.wait()
         if docker.returncode != 0:
