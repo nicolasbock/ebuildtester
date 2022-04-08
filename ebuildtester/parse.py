@@ -119,6 +119,10 @@ def parse_commandline(args):
         "--pull",
         help="Download latest docker image",
         action="store_true")
+    parser.add_argument(
+        "--show-options",
+        help="Show currently selected options and defaults",
+        action="store_true")
 
     options = parser.parse_args(args)
 
@@ -145,5 +149,8 @@ def parse_commandline(args):
 
     if not options.docker_command:
         options.docker_command = os.getenv('DOCKER_COMMAND', default='docker')
+
+    if options.show_options:
+        print(options)
 
     return options
