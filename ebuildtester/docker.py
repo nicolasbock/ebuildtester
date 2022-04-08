@@ -44,7 +44,7 @@ class Docker:
         """
 
         options.log.info("%s %s" % (self.cid[:6], cmd))
-        docker_cmd = ["docker", "exec", "--interactive"]
+        docker_cmd = [options.options.docker_command, "exec", "--interactive"]
         docker_cmd += [self.cid, "/bin/bash"]
         docker = subprocess.Popen(docker_cmd,
                                   stdout=subprocess.PIPE,
