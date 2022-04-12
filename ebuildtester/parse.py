@@ -150,6 +150,10 @@ def parse_commandline(args):
     if not options.docker_command:
         options.docker_command = os.getenv('DOCKER_COMMAND', default='docker')
 
+    # Convert docker command into list so that `subprocess` can run the command
+    # and add command line options if they are present.
+    options.docker_command = options.docker_command.split()
+
     if options.show_options:
         print(options)
 

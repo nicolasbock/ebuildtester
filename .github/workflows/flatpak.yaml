@@ -1,0 +1,33 @@
+name: Build flatpack package
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  
+  build:
+    runs-on: ubuntu-latest
+    name: Build flatpak
+    steps:
+     
+      - name: Check out sources
+        uses: actions/checkout@v2
+
+      - name: Set up flatpak build tools
+        run: |
+          set -e -u -x
+
+          sudo apt update
+          sudo apt install flatpak flatpak-builder
+          sudo flatpak remote-add --if-not-exists \
+            flathub https://flathub.org/repo/flathub.flatpakrepo
+          sudo flatpak install --assumeyes flathub \
+            org.freedesktop.Platform//21.08 org.freedesktop.Sdk//21.08
+
+      - name: Build flatpak
+        run: make flatpak
