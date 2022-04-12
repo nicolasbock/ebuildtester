@@ -11,11 +11,11 @@ on:
 jobs:
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: true
       matrix:
-        python-version: ['3.8', '3.9']
+        python-version: ['3.8', '3.9', '3.10']
     name: Python ${{ matrix.python-version }} build
     steps:
 
@@ -51,19 +51,19 @@ jobs:
 
     - name: Bandit
       run: tox -e bandit
-      if: ${{ matrix.python-version == '3.9' }}
+      if: ${{ matrix.python-version == '3.10' }}
 
     - name: Archive bandit results
       uses: actions/upload-artifact@v2
       with:
         name: bandit log
         path: .tox/bandit/log
-      if: ${{ matrix.python-version == '3.9' && failure() }}
+      if: ${{ matrix.python-version == '3.10' && failure() }}
 
     - name: Pep8
       run: tox -e pep8
-      if: ${{ matrix.python-version == '3.9' }}
+      if: ${{ matrix.python-version == '3.10' }}
 
     - name: Build docs
       run: tox -e docs
-      if: ${{ matrix.python-version == '3.9' }}
+      if: ${{ matrix.python-version == '3.10' }}
