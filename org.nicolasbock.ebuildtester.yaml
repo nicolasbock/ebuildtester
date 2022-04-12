@@ -16,5 +16,6 @@ modules:
       - mv --verbose /app/bin/ebuildtester /app/usr/bin/ebuildtester
       - install --verbose -D ebuildtester-wrapper.sh /app/bin/ebuildtester
     sources:
-      - type: dir
-        path: .
+      - type: git
+        url: https://github.com/nicolasbock/ebuildtester.git
+        branch: main
