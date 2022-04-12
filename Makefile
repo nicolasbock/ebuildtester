@@ -13,3 +13,6 @@ docs:
 
 distclean:
 	rm -rf dist/*
+
+flatpak:
+	flatpak-builder --force-clean build-dir org.nicolasbock.ebuildtester.yaml

@@ -1,6 +1,6 @@
 ---
 
-name: Publish
+name: Publish PyPI Package
 
 on:
   release:

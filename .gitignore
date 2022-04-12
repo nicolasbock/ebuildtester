@@ -2,3 +2,4 @@ build/
 dist/
 ebuildtester.egg-info/
 *__pycache__*
+.vscode/

@@ -8,11 +8,12 @@ from ebuildtester.utils import massage_string
 
 
 class ExecuteFailure(Exception):
+    """Failure to execute command."""
     pass
 
 
 class Docker:
-
+    """The Docker class."""
     def __init__(self, local_portage, overlay_dirs):
         """Create a new container."""
 
@@ -44,7 +45,7 @@ class Docker:
         """
 
         options.log.info("%s %s" % (self.cid[:6], cmd))
-        docker_cmd = [options.options.docker_command, "exec", "--interactive"]
+        docker_cmd = options.options.docker_command + ["exec", "--interactive"]
         docker_cmd += [self.cid, "/bin/bash"]
         docker = subprocess.Popen(docker_cmd,
                                   stdout=subprocess.PIPE,
@@ -94,9 +95,9 @@ class Docker:
         """Run an interactive shell in container."""
 
         options.log.info("running interactive shell in container")
-        docker = subprocess.Popen([options.options.docker_command,
-                                   "exec", "--tty", "--interactive",
-                                   self.cid, "/bin/bash"])
+        docker = subprocess.Popen(options.options.docker_command
+                                  + ["exec", "--tty", "--interactive",
+                                     self.cid, "/bin/bash"])
         try:
             docker.wait()
         except KeyboardInterrupt:
@@ -112,12 +113,12 @@ class Docker:
         """Remove the docker container."""
 
         options.log.info("stopping container")
-        docker = subprocess.Popen([options.options.docker_command,
-                                   "kill", self.cid])
+        docker = subprocess.Popen(options.options.docker_command
+                                  + ["kill", self.cid])
         docker.wait()
         options.log.info("deleting container")
-        docker = subprocess.Popen([options.options.docker_command,
-                                   "rm", self.cid])
+        docker = subprocess.Popen(options.options.docker_command
+                                  + ["rm", self.cid])
         docker.wait()
 
     def _reader(self, proc, stream, name):
@@ -135,27 +136,27 @@ class Docker:
         """Setup the container."""
 
         if options.options.pull:
-            docker_args = [options.options.docker_command,
-                           "pull", docker_image]
+            docker_args = options.options.docker_command \
+                + ["pull", docker_image]
             docker = subprocess.Popen(docker_args)
             docker.wait()
 
     def _create_container(self, docker_image, local_portage, overlays):
         """Create new container."""
 
-        docker_args = [
-            options.options.docker_command, "create",
-            "--tty",
-            "--cap-add", "CAP_SYS_ADMIN",
-            "--cap-add", "CAP_MKNOD",
-            "--cap-add", "CAP_NET_ADMIN",
-            # https://github.com/moby/moby/issues/16429
-            "--security-opt", "apparmor:unconfined",
-            "--device", "/dev/fuse",
-            "--workdir", "/root",
-            "--volume", "%s:/var/db/repos/gentoo" % local_portage,
-            "--volume", "%s/distfiles:/var/cache/distfiles" % local_portage,
-            "--volume", "%s/packages:/var/cache/binpkgs" % local_portage]
+        docker_args = options.options.docker_command \
+            + ["create",
+               "--tty",
+               "--cap-add", "CAP_SYS_ADMIN",
+               "--cap-add", "CAP_MKNOD",
+               "--cap-add", "CAP_NET_ADMIN",
+               # https://github.com/moby/moby/issues/16429
+               "--security-opt", "apparmor:unconfined",
+               "--device", "/dev/fuse",
+               "--workdir", "/root",
+               "--volume", "%s:/var/db/repos/gentoo" % local_portage,
+               "--volume", "%s/distfiles:/var/cache/distfiles" % local_portage,
+               "--volume", "%s/packages:/var/cache/binpkgs" % local_portage]
 
         if options.options.storage_opt:
             for s in options.options.storage_opt:
@@ -182,8 +183,8 @@ class Docker:
     def _start_container(self):
         """Start the container."""
 
-        docker_args = [options.options.docker_command,
-                       "start", "%s" % self.cid]
+        docker_args = options.options.docker_command \
+            + ["start", "%s" % self.cid]
         docker = subprocess.Popen(docker_args, stdout=subprocess.PIPE)
         docker.wait()
         if docker.returncode != 0:
