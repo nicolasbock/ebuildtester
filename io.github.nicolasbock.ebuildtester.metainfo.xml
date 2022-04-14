@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2022 Nicolas Bock <nicolasbock@gmail.com> -->
+<component>
+    <id>io.github.nicolasbock.ebuildtester</id>
+    <metadata_license>CC0-1.0</metadata_license>
+    <content_rating type="oars-1.1" />
+    <name>ebuildtester</name>
+    <summary>
+        Tool to test Gentoo ebuilds in a container.
+    </summary>
+    <description>
+        This script is a tool to test a Gentoo ebuild and its dependencies. The idea is that the package is emerged in a clean (and current) stage3 Docker container.
+    </description>
+    <releases>
+        <release version="v0.1.34" date="2022-04-14">
+            <description>
+                <ul>
+                    <li>First release with FlatPak support</li>
+                </ul>
+            </description>
+        </release>
+    </releases>
+    <url type="homepage">https://github.com/ebuildtester</url>
+</component>
