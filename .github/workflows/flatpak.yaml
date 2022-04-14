@@ -28,6 +28,10 @@ jobs:
             flathub https://flathub.org/repo/flathub.flatpakrepo
           sudo flatpak install --assumeyes flathub \
             org.freedesktop.Platform//21.08 org.freedesktop.Sdk//21.08
-
+          sudo flatpak install --assumeyes flathub org.freedesktop.appstream-glib
+      - name: Verify metadata
+        run: |
+          flatpak run org.freedesktop.appstream-glib \
+            validate io.github.nicolasbock.ebuildtester.metainfo.xml
       - name: Build flatpak
         run: make flatpak
