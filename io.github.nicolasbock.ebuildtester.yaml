@@ -1,4 +1,4 @@
-app-id: org.nicolasbock.ebuildtester
+app-id: io.github.nicolasbock.ebuildtester
 runtime: org.freedesktop.Platform
 runtime-version: '21.08'
 sdk: org.freedesktop.Sdk
@@ -14,6 +14,5 @@ modules:
       - python setup.py install --prefix /app --verbose
       - install --verbose -D ebuildtester-wrapper.sh /app/bin/ebuildtester-wrapper
     sources:
-      - type: git
-        url: https://github.com/nicolasbock/ebuildtester.git
-        branch: main
+      - type: dir
+        path: .
