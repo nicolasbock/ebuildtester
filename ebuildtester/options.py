@@ -8,8 +8,12 @@ def init():
     global log_ch
     global options
 
-    base_packages = list(map(Atom, ["app-portage/gentoolkit",
-                                    "app-portage/flaggie"]))
+    base_packages = list(map(Atom, [
+        "app-portage/gentoolkit",
+        "app-portage/flaggie",
+        "app-portage/repoman",
+        "dev-vcs/git",
+    ]))
     options = None
     log = logging.getLogger("test-package")
     log_ch = logging.StreamHandler()
