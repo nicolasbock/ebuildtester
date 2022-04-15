@@ -1,4 +1,12 @@
+"""The Atom class represents a single atom.
+
+Raises:
+    AtomException: An AtomException is raised when an atom is invalid.
+"""
+
+
 class AtomException(Exception):
+    """A basic Exception."""
     pass
 
 
@@ -16,9 +24,10 @@ class Atom(object):
 
         try:
             self.category, self.package = self.atom.split("/")
-        except ValueError:
+        except ValueError as exc:
             raise AtomException(
-                "ATOM has to be of the form [=]SECTION/PACKAGE[-VERSION]")
+                "ATOM has to be of the form [=]SECTION/PACKAGE[-VERSION]") \
+                    from exc
 
         # Split off version.
         try:
