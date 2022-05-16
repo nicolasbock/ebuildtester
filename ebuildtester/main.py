@@ -1,7 +1,6 @@
 from ebuildtester.docker import Docker, ExecuteFailure
 from ebuildtester.parse import parse_commandline
 import ebuildtester.options as options
-import logging
 import os.path
 import sys
 
@@ -9,11 +8,14 @@ import sys
 def main():
     """The main function."""
 
-    options.init()
-
-    options.log.setLevel(logging.DEBUG)
-
     options.options = parse_commandline(sys.argv[1:])
+    if len(options.options.atom) > 0:
+        options.set_logfile('ebuildtester-'
+                            + ':'.join([f'{atom.category}-{atom.package}'
+                                        for atom in options.options.atom])
+                            + '.log')
+    else:
+        options.set_logfile('ebuildtester-manual.log')
 
     options.log.info("creating container")
     container = Docker(
