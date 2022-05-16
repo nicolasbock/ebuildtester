@@ -20,7 +20,7 @@ def main():
         os.path.abspath(os.path.expanduser(options.options.portage_dir)),
         [os.path.abspath(p) for p in options.options.overlay_dir])
 
-    options.log.info("created container " + container.cid)
+    options.log.info("created container %s", container.cid)
     if options.options.manual:
         container.shell()
     else:
@@ -29,12 +29,12 @@ def main():
                           " >> ~/.bash_history")
 
         for i in range(5):
-            options.log.info("emerge attempt %d (of %d)" % (i + 1, 5))
+            options.log.info("emerge attempt %d (of %d)", i + 1, 5)
             try:
                 container.execute("emerge --autounmask-write=y --verbose " +
                                   " ".join(map(str, options.options.atom)))
             except ExecuteFailure:
-                options.log.warn(
+                options.log.warning(
                     "command failed, updating configuration files")
                 container.execute("etc-update --verbose --automode -5")
             else:

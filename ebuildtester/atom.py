@@ -1,4 +1,8 @@
+"""An Atom."""
+
+
 class AtomException(Exception):
+    """An exception in this class."""
     pass
 
 
