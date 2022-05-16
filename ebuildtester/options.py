@@ -17,7 +17,7 @@ def init():
     log_ch.setFormatter(logging.Formatter("%(asctime)s - %(message)s"))
     log.addHandler(log_ch)
 
-    fh = logging.FileHandler("tester.log", "a")
+    fh = logging.FileHandler("/tmp/ebuildtester.log", "a")
     fh.setLevel(logging.INFO)
     fh.setFormatter(logging.Formatter("%(asctime)s - %(message)s"))
     log.addHandler(fh)
