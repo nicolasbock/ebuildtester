@@ -52,7 +52,7 @@ apps:
 parts:
   ebuildtester:
     plugin: python
-    source: https://github.com/nicolasbock/ebuildtester.git
+    source: .
     source-type: git
     source-branch: main
     override-pull: |
@@ -60,8 +60,12 @@ parts:
       snapcraftctl set-version "$(git describe)"
     requirements:
       - requirements.txt
+
   docker-wrapper:
     plugin: dump
     source: .
-    organize:
-      docker-wrapper.sh: /usr/bin/docker-wrapper.sh
+    override-build: |
+      set -e -u -x
+      install -D docker-wrapper.sh ${SNAPCRAFT_PART_INSTALL}/usr/bin/docker-wrapper.sh
+    stage:
+      - usr/bin/docker-wrapper.sh

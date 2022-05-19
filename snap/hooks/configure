@@ -2,6 +2,8 @@
 
 set -e -u
 
+echo "Running configure hook"
+
 if ! snapctl is-connected docker-executables; then
     echo "Please run"
     echo
