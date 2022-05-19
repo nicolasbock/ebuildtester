@@ -20,6 +20,10 @@ current) stage3 Docker container.
    :alt: Join the chat at https://gitter.im/ebuildtester/ebuildtester
    :target: https://gitter.im/ebuildtester/ebuildtester?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 
+.. image:: https://snapcraft.io/static/images/badges/en/snap-store-black.svg
+   :alt: Get it from the Snap Store
+   :target: https://snapcraft.io/ebuildtester
+
 Requirements
 ------------
 
