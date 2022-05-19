@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -e -u
+
+if ! snapctl is-connected docker-executables; then
+    echo "Please run"
+    echo
+    echo "snap connect ebuildtester:docker-executables docker:docker-executables"
+    echo
+    echo "in order to use the ebuildtester command."
+fi
