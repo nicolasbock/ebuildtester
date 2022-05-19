@@ -54,7 +54,7 @@ parts:
     plugin: python
     source: https://github.com/nicolasbock/ebuildtester.git
     source-type: git
-    source-tag: v0.1.35
+    source-branch: main
     override-pull: |
       snapcraftctl pull
       snapcraftctl set-version "$(git describe)"
