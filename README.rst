@@ -1,9 +1,8 @@
 Introduction
 ============
 
-This script is a tool to test a Gentoo ebuild and its
-dependencies. The idea is that the package is emerged in a clean (and
-current) stage3 Docker container.
+This is a tool to test a Gentoo ebuild and its dependencies. The idea is that
+the ebuild is emerged in a clean (and current) stage3 Docker container.
 
 .. image:: https://badge.fury.io/py/ebuildtester.svg
     :target: https://badge.fury.io/py/ebuildtester
@@ -27,7 +26,7 @@ current) stage3 Docker container.
 Requirements
 ------------
 
-You require `Docker <https://wiki.gentoo.org/wiki/Docker>`_ and `FUSE
+Using require `Docker <https://wiki.gentoo.org/wiki/Docker>`_ and `FUSE
 <https://wiki.gentoo.org/wiki/Filesystem_in_Userspace>`_. Docker must be
 configured to use the `devicemapper
 <https://docs.docker.com/storage/storagedriver/device-mapper-driver/>`_
