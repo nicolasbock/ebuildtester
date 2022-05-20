@@ -44,6 +44,7 @@ plugs:
 apps:
   ebuildtester:
     command: bin/ebuildtester
+    completer: usr/share/bash-completion/completions/ebuildtester.bash-completion
   docker:
     command: usr/bin/docker-wrapper.sh
     plugs:
@@ -66,6 +67,10 @@ parts:
     source: .
     override-build: |
       set -e -u -x
-      install -D docker-wrapper.sh ${SNAPCRAFT_PART_INSTALL}/usr/bin/docker-wrapper.sh
+      install -D docker-wrapper.sh \
+        ${SNAPCRAFT_PART_INSTALL}/usr/bin/docker-wrapper.sh
+      install -D ebuildtester.bash-completion \
+        ${SNAPCRAFT_PART_INSTALL}/usr/share/bash-completion/completions/ebuildtester.bash-completion
     stage:
       - usr/bin/docker-wrapper.sh
+      - usr/share/bash-completion/completions/ebuildtester.bash-completion
