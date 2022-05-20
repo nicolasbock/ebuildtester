@@ -18,4 +18,3 @@ _ebuildtester() {
 
 }
 complete -F _ebuildtester ebuildtester
-complete -F _ebuildtester ebuildtester.ebuildtester
