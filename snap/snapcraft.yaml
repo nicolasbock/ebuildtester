@@ -50,11 +50,6 @@ apps:
     plugs:
       - docker
 
-# hooks:
-#   configure:
-#     passthrough:
-#       test-hook: test-hook
-
 parts:
   ebuildtester:
     plugin: python
