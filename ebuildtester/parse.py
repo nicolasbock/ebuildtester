@@ -124,6 +124,11 @@ def parse_commandline(args):
         help="Show currently selected options and defaults",
         action="store_true")
 
+    if '--complete' in args:
+        print('Suggesting')
+        args.pop(args.index('--complete'))
+        print(f'args = {",".join(args)}')
+
     options = parser.parse_args(args)
 
     if not options.manual and options.atom is None:

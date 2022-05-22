@@ -3,10 +3,38 @@ _ebuildtester() {
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
-    opts="--help --portage-dir --overlay-dir --update --atom --threads"
+    opts=(
+      --help
+      --version
+      --atom
+      --binhost
+      --live-ebuild
+      --manual
+      --portage-dir
+      --overlay-dir
+      --update
+      --install-basic-packages
+      --threads
+      --use
+      --global-use
+      --unmask
+      --unstable
+      --gcc-version
+      --python-single-target
+      --python-targets
+      --rm
+      --storage-opt
+      --with-X
+      --with-vnc
+      --profile
+      --docker-image
+      --docker-command
+      --pull
+      --show-options
+    )
 
     if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
-        COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+        COMPREPLY=( $(compgen -W "${opts[*]}" -- ${cur}) )
         return 0
     fi
 
