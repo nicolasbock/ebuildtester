@@ -131,8 +131,8 @@ def parse_commandline(args):
 
     if options.atom:
         temp = []
-        for a in options.atom:
-            temp += a
+        for atom in options.atom:
+            temp += atom
         options.atom = temp
     else:
         options.atom = []
