@@ -43,6 +43,8 @@ plugs:
 
 apps:
   ebuildtester:
+    environment:
+      XDG_STATE_HOME: ${SNAP_USER_DATA}
     command: bin/ebuildtester
     completer: usr/share/bash-completion/completions/ebuildtester.bash-completion
   docker:
