@@ -1,5 +1,5 @@
 _ebuildtester() {
-    local cur prev opts
+    local cur prev opts prefix
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
@@ -27,22 +27,31 @@ _ebuildtester() {
       --with-X
       --with-vnc
       --profile
+      --features
       --docker-image
       --docker-command
       --pull
       --show-options
     )
 
-    if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
-        COMPREPLY=( $(compgen -W "${opts[*]}" -- ${cur}) )
-        return 0
-    fi
-
     case "${prev}" in
         --portage-dir|--overlay-dir)
             COMPREPLY=( $(compgen -o dirnames -A directory ${cur}) )
             ;;
+        --features)
+            if [[ ${cur} =~ ^- ]]; then
+              prefix=("-P" "-")
+            else
+              prefix=()
+            fi
+            echo
+            COMPREPLY=( $(compgen ${prefix[@]} -W "ccache sandbox userfetch" -- ${cur#-}) )
+            ;;
     esac
 
+    if [[ ( ${cur} =~ ^-.* && ${prev} != --features ) || ${COMP_CWORD} -eq 1 ]] ; then
+        COMPREPLY=( $(compgen -W "${opts[*]}" -- ${cur}) )
+        return 0
+    fi
 }
 complete -F _ebuildtester ebuildtester

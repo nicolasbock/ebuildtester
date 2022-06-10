@@ -109,6 +109,13 @@ def parse_commandline(args):
         help="The profile to use (default = %(default)s)",
         default="default/linux/amd64/17.1")
     parser.add_argument(
+        '--features',
+        help="Set FEATURES, see https://wiki.gentoo.org/wiki/FEATURES "
+             "(default = %(default)s)",
+        default=["-sandbox", "-usersandbox", "userfetch"],
+        nargs="+",
+        action="append")
+    parser.add_argument(
         "--docker-image",
         help="Specify the docker image to use (default = %(default)s)",
         default="gentoo/stage3")
@@ -141,6 +148,17 @@ def parse_commandline(args):
         options.atom = temp
     else:
         options.atom = []
+
+    temp = []
+    for feature in options.features:
+        if type(feature) is list:
+            temp += feature
+        else:
+            temp.append(feature)
+    options.features = temp
+
+    if options.binhost:
+        options.features.append("getbinpkg")
 
     if options.with_vnc:
         options.atom += ["net-misc/tigervnc", "x11-wm/icewm"]
