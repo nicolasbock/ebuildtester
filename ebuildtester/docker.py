@@ -3,7 +3,7 @@
 import os
 import re
 import sys
-import subprocess
+import docker
 
 import ebuildtester.options as options
 from ebuildtester.utils import massage_string
