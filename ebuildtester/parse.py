@@ -130,6 +130,9 @@ def parse_commandline(args):
         "--show-options",
         help="Show currently selected options and defaults",
         action="store_true")
+    parser.add_argument(
+        "--ccache",
+        help="Ccache path to mount into docker container")
 
     if '--complete' in args:
         print('Suggesting')
@@ -159,6 +162,9 @@ def parse_commandline(args):
 
     if options.binhost:
         options.features.append("getbinpkg")
+
+    if options.ccache:
+        options.features.append("ccache")
 
     if options.with_vnc:
         options.atom += ["net-misc/tigervnc", "x11-wm/icewm"]

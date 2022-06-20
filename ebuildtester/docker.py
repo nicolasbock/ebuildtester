@@ -162,6 +162,10 @@ class Docker:
             for s in options.options.storage_opt:
                 docker_args += ["--storage-opt", "%s" % s]
 
+        ccache = options.options.ccache
+        if ccache:
+            docker_args += ["--volume=%s:/var/tmp/ccache" % ccache]
+
         for o in overlays:
             docker_args += ["--volume=%s:%s" % o]
 
@@ -229,6 +233,8 @@ class Docker:
             self.execute(("echo */* PYTHON_TARGETS: %s" %
                           (options.options.python_targets)) +
                          " >> /etc/portage/package.use/python")
+        if options.options.ccache:
+            self.execute("emerge --verbose dev-util/ccache")
 
     def _get_repo_names(self, overlay_dirs):
         """Get repo names from local overlay settings."""
