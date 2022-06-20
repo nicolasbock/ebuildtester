@@ -19,13 +19,15 @@ class Docker:
     def __init__(self, local_portage, overlay_dirs):
         """Create a new container."""
 
-        docker_image = options.OPTIONS.docker_image
+        self.docker_client = docker.client.from_env()
+        self.docker_image_name = options.OPTIONS.docker_image
+        self.docker_image = None
         repo_names = self._get_repo_names(overlay_dirs)
         overlay_mountpoints = [os.path.join("/var/lib/overlays", r)
                                for r in repo_names]
 
-        self._setup_container(docker_image)
-        self._create_container(docker_image, local_portage,
+        self._setup_container()
+        self._create_container(local_portage,
                                zip(overlay_dirs, overlay_mountpoints))
         self._start_container()
         self._set_profile()
@@ -139,31 +141,38 @@ class Docker:
                              (self.cid[:6], name, out.rstrip()))
             options.log_ch.flush()
 
-    def _setup_container(self, docker_image):
+    def _setup_container(self):
         """Setup the container."""
 
         if options.OPTIONS.pull:
-            docker_args = options.OPTIONS.docker_command \
-                + ["pull", docker_image]
-            docker = subprocess.Popen(docker_args)
-            docker.wait()
+            options.log.info(f'pulling image {self.docker_image_name}')
+            self.docker_image = self.docker_client \
+                .images.pull(self.docker_image_name)
+        else:
+            self.docker_image = self.docker_client.images \
+                .get(self.docker_image_name)
+        options.log.debug('image = %s', self.docker_image)
 
-    def _create_container(self, docker_image, local_portage, overlays):
+    def _create_container(self, local_portage, overlays):
         """Create new container."""
 
-        docker_args = options.OPTIONS.docker_command \
-            + ["create",
-               "--tty",
-               "--cap-add", "CAP_SYS_ADMIN",
-               "--cap-add", "CAP_MKNOD",
-               "--cap-add", "CAP_NET_ADMIN",
+        docker_args = {
+               "--tty": None,
+               "--cap-add": [
+                   "CAP_SYS_ADMIN",
+                   "CAP_MKNOD",
+                   "CAP_NET_ADMIN",
+               ],
                # https://github.com/moby/moby/issues/16429
-               "--security-opt", "apparmor:unconfined",
-               "--device", "/dev/fuse",
-               "--workdir", "/root",
-               "--volume", "%s:/var/db/repos/gentoo" % local_portage,
-               "--volume", "%s/distfiles:/var/cache/distfiles" % local_portage,
-               "--volume", "%s/packages:/var/cache/binpkgs" % local_portage]
+               "--security-opt": "apparmor:unconfined",
+               "--device": "/dev/fuse",
+               "--workdir": "/root",
+               "--volume": [
+                   "%s:/var/db/repos/gentoo" % local_portage,
+                   "%s/distfiles:/var/cache/distfiles" % local_portage,
+                   "%s/packages:/var/cache/binpkgs" % local_portage,
+               ],
+        }
 
         if options.OPTIONS.storage_opt:
             for s in options.OPTIONS.storage_opt:
@@ -176,9 +185,11 @@ class Docker:
         for o in overlays:
             docker_args += ["--volume=%s:%s" % o]
 
-        docker_args += [docker_image]
-        options.log.info("creating docker container with: %s" %
+        docker_args += [self.docker_image_name]
+        options.log.info("creating docker container with: %s",
                          " ".join(docker_args))
+        self.docker_client.containers.create(self.docker_image, **docker_args)
+
         docker = subprocess.Popen(docker_args, stdout=subprocess.PIPE)
         docker.wait()
 
