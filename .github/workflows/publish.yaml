@@ -5,9 +5,9 @@ name: Publish PyPI Package
 on:
   release:
     types: [created]
+  workflow_dispatch:
 
 jobs:
-
   publish:
     runs-on: ubuntu-latest
     name: Publish PyPI Package
