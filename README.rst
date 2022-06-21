@@ -44,14 +44,14 @@ Usage
 
 We are going to assume that the user has a local git clone of the portage tree in
 
-.. code-block:: bash
+.. code-block:: console
 
    /usr/local/git/gentoo
 
 We have added a new ebuild and would like to verify that the build
 dependencies are all correct. We can build the package (ATOM) with:
 
-.. code-block:: bash
+.. code-block:: console
 
    ebuildtester --portage-dir /usr/local/git/gentoo \
      --atom ATOM \
@@ -68,7 +68,7 @@ Command line arguments
 
 The command understands the following command line arguments:
 
-.. code-block:: bash
+.. code-block:: console
 
    usage: ebuildtester [-h] [--version] [--atom ATOM [ATOM ...]] [--binhost BINHOST] [--live-ebuild]
                        [--manual] --portage-dir PORTAGE_DIR [--overlay-dir OVERLAY_DIR] [--update]
@@ -116,3 +116,9 @@ The command understands the following command line arguments:
      --docker-image DOCKER_IMAGE
                            Specify the docker image to use (default = gentoo/stage3)
      --pull                Download latest docker image
+
+Developer Instructions
+----------------------
+
+For more information and how to contribute to this project see the
+:doc:`Contributing <contributing>` page.
