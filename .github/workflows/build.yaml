@@ -15,8 +15,6 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - os: ubuntu-18.04
-            python-version: 3.6
           - os: ubuntu-22.04
             python-version: 3.7
           - os: ubuntu-22.04
@@ -49,7 +47,7 @@ jobs:
     - name: Install tox
       run: sudo apt install --yes tox
 
-    - name: Test
+    - name: Build and test
       run: tox -e ${{ env.tox_environment }}
 
     - name: Archive test results
@@ -76,4 +74,8 @@ jobs:
 
     - name: Build docs
       run: tox -e docs
+      if: ${{ matrix.python-version == '3.10' }}
+
+    - name: Test PyPi Package
+      run: tox -e pypi
       if: ${{ matrix.python-version == '3.10' }}
