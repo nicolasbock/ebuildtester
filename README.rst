@@ -124,9 +124,3 @@ The command understands the following command line arguments:
      --pull                Download latest docker image
      --show-options        Show currently selected options and defaults
      --ccache CCACHE_DIR   Path to mount that contains ccache cache
-
-Developer Instructions
-----------------------
-
-For more information and how to contribute to this project see the
-:doc:`Contributing <contributing>` page.
