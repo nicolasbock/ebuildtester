@@ -12,14 +12,20 @@ jobs:
     runs-on: ubuntu-latest
     name: Publish PyPI Package
     steps:
+
     - name: Check out sources
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
+
     - name: Set up Python
       uses: actions/setup-python@v1
       with:
         python-version: '3.10'
+
+    - name: Install tox
+      run: sudo apt install --yes tox
+
     - name: Publish PyPI Package
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
