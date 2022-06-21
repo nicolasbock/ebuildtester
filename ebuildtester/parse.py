@@ -132,7 +132,8 @@ def parse_commandline(args):
         action="store_true")
     parser.add_argument(
         "--ccache",
-        help="Ccache path to mount into docker container")
+        metavar="CCACHE_DIR",
+        help="Path to mount that contains ccache cache")
 
     if '--complete' in args:
         print('Suggesting')
