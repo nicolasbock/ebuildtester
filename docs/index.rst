@@ -1,5 +1,9 @@
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :numbered:
+
+   ../README.rst
+   contributing.rst
+   ebuildtester.rst
 
 .. include:: ../README.rst
