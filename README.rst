@@ -75,13 +75,14 @@ The command understands the following command line arguments:
                        [--install-basic-packages] [--threads N] [--use USE [USE ...]]
                        [--global-use GLOBAL_USE [GLOBAL_USE ...]] [--unmask ATOM] [--unstable]
                        [--gcc-version VER] [--python-single-target PYTHON_SINGLE_TARGET]
-                       [--python-targets PYTHON_TARGETS] [--rm]
-                       [--storage-opt STORAGE_OPT [STORAGE_OPT ...]] [--with-X] [--with-vnc]
-                       [--profile PROFILE] [--docker-image DOCKER_IMAGE] [--pull]
+                       [--python-targets PYTHON_TARGETS] [--rm] [--storage-opt STORAGE_OPT [STORAGE_OPT ...]]
+                       [--with-X] [--with-vnc] [--profile PROFILE] [--features FEATURES [FEATURES ...]]
+                       [--docker-image DOCKER_IMAGE] [--docker-command DOCKER_COMMAND] [--pull]
+                       [--show-options] [--ccache CCACHE_DIR]
 
    A dockerized approach to test a Gentoo package within a clean stage3.
 
-   optional arguments:
+   options:
      -h, --help            show this help message and exit
      --version             show program's version number and exit
      --atom ATOM [ATOM ...]
@@ -113,9 +114,16 @@ The command understands the following command line arguments:
      --with-X              Globally enable the X USE flag
      --with-vnc            Install VNC server to test graphical applications
      --profile PROFILE     The profile to use (default = default/linux/amd64/17.1)
+     --features FEATURES [FEATURES ...]
+                           Set FEATURES, see https://wiki.gentoo.org/wiki/FEATURES (default = ['-sandbox',
+                           '-usersandbox', 'userfetch'])
      --docker-image DOCKER_IMAGE
                            Specify the docker image to use (default = gentoo/stage3)
+     --docker-command DOCKER_COMMAND
+                           Specify the docker command
      --pull                Download latest docker image
+     --show-options        Show currently selected options and defaults
+     --ccache CCACHE_DIR   Path to mount that contains ccache cache
 
 Developer Instructions
 ----------------------
