@@ -19,9 +19,14 @@ jobs:
         fetch-depth: 0
 
     - name: Set up Python
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v4
       with:
         python-version: '3.10'
+
+    - name: Get tox environment
+      run: |
+        tox_environment="py310"
+        echo "tox_environment=${tox_environment}" >> $GITHUB_ENV
 
     - name: Install tox
       run: sudo apt install --yes tox
