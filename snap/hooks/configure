@@ -8,5 +8,5 @@ if ! snapctl is-connected docker-executables; then
     echo "snap connect ebuildtester:docker-executables docker:docker-executables"
     echo
     echo "in order to use the ebuildtester command."
-    exit 1
+    # exit 1
 fi
