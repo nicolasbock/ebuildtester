@@ -6,13 +6,13 @@ description: |
   This is a tool to test a Gentoo ebuild and its dependencies. The idea is
   that the ebuild is emerged in a clean (and current) stage3 Docker container.
 
-  ## Installation
+  * Installation
 
   This snap uses the `docker` snap and needs to be connected via
 
      snap connect ebuildtester:docker-executables docker:docker-executables
 
-  ## Usage
+  * Usage
 
   We are going to assume that the user has a local git clone of the portage
   tree in
