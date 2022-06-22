@@ -10,19 +10,19 @@ description: |
 
   This snap uses the `docker` snap and needs to be connected via
 
-      snap connect ebuildtester:docker-executables docker:docker-executables
+     snap connect ebuildtester:docker-executables docker:docker-executables
 
   * Usage
 
   We are going to assume that the user has a local git clone of the portage
   tree in
 
-      /usr/local/git/gentoo
+     /usr/local/git/gentoo
 
   We have added a new ebuild and would like to verify that the build
   dependencies are all correct. We can build the package (ATOM) with:
 
-      ebuildtester \
+     ebuildtester \
         --portage-dir /usr/local/git/gentoo \
         --atom ATOM \
         --use USE1 USE2
@@ -33,7 +33,7 @@ description: |
 
   For a full list of supported options run
 
-      ebuildtester --help
+     ebuildtester --help
 
 grade: stable
 confinement: strict
