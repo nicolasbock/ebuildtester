@@ -134,6 +134,10 @@ def parse_commandline(args):
         "--ccache",
         metavar="CCACHE_DIR",
         help="Path to mount that contains ccache cache")
+    parser.add_argument(
+        '--batch',
+        help='Do not drop into interactive shell',
+        action='store_true')
 
     if '--complete' in args:
         print('Suggesting')
