@@ -78,7 +78,7 @@ The command understands the following command line arguments:
                        [--python-targets PYTHON_TARGETS] [--rm] [--storage-opt STORAGE_OPT [STORAGE_OPT ...]]
                        [--with-X] [--with-vnc] [--profile PROFILE] [--features FEATURES [FEATURES ...]]
                        [--docker-image DOCKER_IMAGE] [--docker-command DOCKER_COMMAND] [--pull]
-                       [--show-options] [--ccache CCACHE_DIR]
+                       [--show-options] [--ccache CCACHE_DIR] [--batch]
 
    A dockerized approach to test a Gentoo package within a clean stage3.
 
@@ -124,3 +124,4 @@ The command understands the following command line arguments:
      --pull                Download latest docker image
      --show-options        Show currently selected options and defaults
      --ccache CCACHE_DIR   Path to mount that contains ccache cache
+     --batch               Do not drop into interactive shell
