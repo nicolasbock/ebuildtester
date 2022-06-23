@@ -32,10 +32,12 @@ _ebuildtester() {
       --docker-command
       --pull
       --show-options
+      --ccache
+      --batch
     )
 
     case "${prev}" in
-        --portage-dir|--overlay-dir)
+        --portage-dir|--overlay-dir|--ccache)
             COMPREPLY=( $(compgen -o dirnames -A directory ${cur}) )
             ;;
         --features)
