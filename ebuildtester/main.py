@@ -17,6 +17,8 @@ def main():
     else:
         options.set_logfile('ebuildtester-manual.log')
 
+    options.log.info(
+        "*** please note that all necessary licenses will be accepted ***")
     options.log.info("creating container")
     container = Docker(
         os.path.abspath(os.path.expanduser(options.options.portage_dir)),
@@ -26,15 +28,20 @@ def main():
     if options.options.manual:
         container.shell()
     else:
-        container.execute("echo emerge --ask --autounmask-write=y --verbose " +
-                          " ".join(map(str, options.options.atom)) +
+        emerge_command = [
+            "emerge",
+            "--verbose ",
+            "--autounmask-write=y ",
+            "--autounmask-license=y ",
+            "--autounmask-continue=y ",
+            " ".join(map(str, options.options.atom))]
+        container.execute(" ".join(["echo"] + emerge_command + ["--ask"]) +
                           " >> ~/.bash_history")
 
         for i in range(5):
             options.log.info("emerge attempt %d (of %d)", i + 1, 5)
             try:
-                container.execute("emerge --autounmask-write=y --verbose " +
-                                  " ".join(map(str, options.options.atom)))
+                container.execute(emerge_command)
             except ExecuteFailure:
                 options.log.warning(
                     "command failed, updating configuration files")
