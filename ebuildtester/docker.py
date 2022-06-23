@@ -41,10 +41,15 @@ class Docker:
     def execute(self, cmd):
         """Execute command in container.
 
-        cmd is a string which is executed within a bash shell.
+        cmd is a list of strings or a simple string with a command that is
+        executed within a bash shell.
         """
 
-        options.log.info("%s %s" % (self.cid[:6], cmd))
+        if isinstance(cmd, list):
+            cmd_string = ' '.join(cmd)
+        else:
+            cmd_string = cmd
+        options.log.info("%s %s", self.cid[:6], cmd)
         docker_cmd = options.options.docker_command + ["exec", "--interactive"]
         docker_cmd += [self.cid, "/bin/bash"]
         docker = subprocess.Popen(docker_cmd,
@@ -52,7 +57,7 @@ class Docker:
                                   stderr=subprocess.PIPE,
                                   stdin=subprocess.PIPE,
                                   universal_newlines=True)
-        docker.stdin.write(cmd + "\n")
+        docker.stdin.write(cmd_string + "\n")
         docker.stdin.close()
 
         stdout_reader = os.fork()
