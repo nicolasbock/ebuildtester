@@ -1,0 +1,59 @@
+name: Functional testing
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  functional_testing:
+    runs-on: ubuntu-latest
+    name: Functional testing
+    steps:
+      - name: Check out sources
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install
+        run: |
+          sudo apt install python3-pip
+          sudo pip install -r requirements.txt
+          python3 setup.py install
+
+      - name: Clone portage
+        run: |
+          pushd ${HOME}
+          git clone --depth 1 https://github.com/gentoo/gentoo.git
+          popd
+
+      - name: Docker info
+        run: docker info
+
+      - name: Testbuild of `nano`
+        run: |
+          ebuildtester --portage-dir ~/gentoo \
+            --rm \
+            --pull \
+            --ccache /var/tmp/ccache \
+            --atom app-editors/nano
+
+      - name: Test whether any container is still running
+        run: docker ps --all
+
+      - name: Archive test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: ebuildtester log
+          path: |
+            /tmp/ebuildtester*.log
+            /var/tmp/ccache/

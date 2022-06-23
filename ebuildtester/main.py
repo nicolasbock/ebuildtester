@@ -41,7 +41,8 @@ def main():
                 container.execute("etc-update --verbose --automode -5")
             else:
                 break
-        options.log.info("opening interactive shell")
-        container.shell()
+        if not options.options.batch:
+            options.log.info("opening interactive shell")
+            container.shell()
 
     container.cleanup()
