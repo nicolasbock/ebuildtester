@@ -41,7 +41,7 @@ _ebuildtester() {
     case "${prev}" in
         --portage-dir|--overlay-dir|--ccache)
             COMPREPLY=( $(compgen -o filenames -o dirnames -o plusdirs ${cur}) )
-            compopt -o nospace
+            compopt -o nospace -o filenames -o dirnames -o plusdirs
             ;;
         --features)
             if [[ ${cur} =~ ^- ]]; then
