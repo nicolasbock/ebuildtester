@@ -1,5 +1,5 @@
 name: ebuildtester
-base: core20
+base: core22
 adopt-info: ebuildtester
 summary: Tool to test a Gentoo ebuild and its dependencies
 description: |
@@ -69,7 +69,7 @@ parts:
     override-pull: |
       snapcraftctl pull
       snapcraftctl set-version "$(git describe)"
-    requirements:
+    python-requirements:
       - requirements.txt
 
   docker-wrapper:
