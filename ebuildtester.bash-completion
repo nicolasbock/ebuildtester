@@ -1,3 +1,5 @@
+# vim: syntax=sh:tabstop=4:shiftwidth=4:expandtab
+
 _ebuildtester() {
     local cur prev opts prefix
     COMPREPLY=()
@@ -38,7 +40,8 @@ _ebuildtester() {
 
     case "${prev}" in
         --portage-dir|--overlay-dir|--ccache)
-            COMPREPLY=( $(compgen -o filenames -o dirnames -o nospace ${cur}) )
+            COMPREPLY=( $(compgen -o filenames -o dirnames -o plusdirs ${cur}) )
+            compopt -o nospace
             ;;
         --features)
             if [[ ${cur} =~ ^- ]]; then
@@ -49,11 +52,15 @@ _ebuildtester() {
             echo
             COMPREPLY=( $(compgen ${prefix[@]} -W "ccache sandbox userfetch" -- ${cur#-}) )
             ;;
+        *)
+            if [[ ${cur} =~ ^-.* || ${COMP_CWORD} -eq 1 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts[*]}" -- ${cur}) )
+            else
+                echo "I should not be here"
+                exit 1
+            fi
+            ;;
     esac
-
-    if [[ ( ${cur} =~ ^-.* && ${prev} != --features ) || ${COMP_CWORD} -eq 1 ]] ; then
-        COMPREPLY=( $(compgen -W "${opts[*]}" -- ${cur}) )
-        return 0
-    fi
 }
+
 complete -F _ebuildtester ebuildtester
