@@ -17,7 +17,7 @@ class Docker:
     def __init__(self, local_portage, overlay_dirs):
         """Create a new container."""
 
-        docker_image = options.options.docker_image
+        docker_image = options.OPTIONS.docker_image
         repo_names = self._get_repo_names(overlay_dirs)
         overlay_mountpoints = [os.path.join("/var/lib/overlays", r)
                                for r in repo_names]
@@ -50,7 +50,7 @@ class Docker:
         else:
             cmd_string = cmd
         options.log.info("%s %s", self.cid[:6], cmd)
-        docker_cmd = options.options.docker_command + ["exec", "--interactive"]
+        docker_cmd = options.OPTIONS.docker_command + ["exec", "--interactive"]
         docker_cmd += [self.cid, "/bin/bash"]
         docker = subprocess.Popen(docker_cmd,
                                   stdout=subprocess.PIPE,
@@ -100,7 +100,7 @@ class Docker:
         """Run an interactive shell in container."""
 
         options.log.info("running interactive shell in container")
-        docker = subprocess.Popen(options.options.docker_command
+        docker = subprocess.Popen(options.OPTIONS.docker_command
                                   + ["exec", "--tty", "--interactive",
                                      self.cid, "/bin/bash"])
         try:
@@ -111,18 +111,18 @@ class Docker:
     def cleanup(self):
         """Clean up."""
 
-        if options.options.rm:
+        if options.OPTIONS.rm:
             self.remove()
 
     def remove(self):
         """Remove the docker container."""
 
         options.log.info("stopping container")
-        docker = subprocess.Popen(options.options.docker_command
+        docker = subprocess.Popen(options.OPTIONS.docker_command
                                   + ["kill", self.cid])
         docker.wait()
         options.log.info("deleting container")
-        docker = subprocess.Popen(options.options.docker_command
+        docker = subprocess.Popen(options.OPTIONS.docker_command
                                   + ["rm", self.cid])
         docker.wait()
 
@@ -140,8 +140,8 @@ class Docker:
     def _setup_container(self, docker_image):
         """Setup the container."""
 
-        if options.options.pull:
-            docker_args = options.options.docker_command \
+        if options.OPTIONS.pull:
+            docker_args = options.OPTIONS.docker_command \
                 + ["pull", docker_image]
             docker = subprocess.Popen(docker_args)
             docker.wait()
@@ -149,7 +149,7 @@ class Docker:
     def _create_container(self, docker_image, local_portage, overlays):
         """Create new container."""
 
-        docker_args = options.options.docker_command \
+        docker_args = options.OPTIONS.docker_command \
             + ["create",
                "--tty",
                "--cap-add", "CAP_SYS_ADMIN",
@@ -163,11 +163,11 @@ class Docker:
                "--volume", "%s/distfiles:/var/cache/distfiles" % local_portage,
                "--volume", "%s/packages:/var/cache/binpkgs" % local_portage]
 
-        if options.options.storage_opt:
-            for s in options.options.storage_opt:
+        if options.OPTIONS.storage_opt:
+            for s in options.OPTIONS.storage_opt:
                 docker_args += ["--storage-opt", "%s" % s]
 
-        ccache = options.options.ccache
+        ccache = options.OPTIONS.ccache
         if ccache:
             docker_args += ["--volume=%s:/var/tmp/ccache" % ccache]
 
@@ -192,7 +192,7 @@ class Docker:
     def _start_container(self):
         """Start the container."""
 
-        docker_args = options.options.docker_command \
+        docker_args = options.OPTIONS.docker_command \
             + ["start", "%s" % self.cid]
         docker = subprocess.Popen(docker_args, stdout=subprocess.PIPE)
         docker.wait()
@@ -203,8 +203,8 @@ class Docker:
         """Set the Gentoo profile."""
 
         options.log.info("setting Gentoo profile to %s" %
-                         options.options.profile)
-        self.execute("eselect profile set %s" % options.options.profile)
+                         options.OPTIONS.profile)
+        self.execute("eselect profile set %s" % options.OPTIONS.profile)
 
     def _tweak_settings(self):
         """Tweak portage settings."""
@@ -214,31 +214,31 @@ class Docker:
         # Disable the usersandbox feature, it's not working well inside a
         # docker container.
         self.execute(
-            f"echo FEATURES=\\\"{' '.join(options.options.features)}\\\" "
+            f"echo FEATURES=\\\"{' '.join(options.OPTIONS.features)}\\\" "
             ">> /etc/portage/make.conf")
 
         self.execute(("echo MAKEOPTS=\\\"-j%d\\\" " %
-                      (options.options.threads)) +
+                      (options.OPTIONS.threads)) +
                      ">> /etc/portage/make.conf")
-        if options.options.binhost:
+        if options.OPTIONS.binhost:
             self.execute("echo PORTAGE_BINHOST=\\\"{}\\\""
                          ">> /etc/portage/make.conf"
-                         .format(options.options.binhost))
-        if options.options.unstable:
+                         .format(options.OPTIONS.binhost))
+        if options.OPTIONS.unstable:
             self.execute("echo ACCEPT_KEYWORDS=\\\"~amd64\\\" " +
                          ">> /etc/portage/make.conf")
-        if options.options.with_X:
+        if options.OPTIONS.with_X:
             self.execute("emerge --verbose gentoolkit")
             self.execute("euse --enable X")
-        if options.options.python_single_target:
+        if options.OPTIONS.python_single_target:
             self.execute(("echo */* PYTHON_SINGLE_TARGET: %s" %
-                          (options.options.python_single_target)) +
+                          (options.OPTIONS.python_single_target)) +
                          " >> /etc/portage/package.use/python")
-        if options.options.python_targets:
+        if options.OPTIONS.python_targets:
             self.execute(("echo */* PYTHON_TARGETS: %s" %
-                          (options.options.python_targets)) +
+                          (options.OPTIONS.python_targets)) +
                          " >> /etc/portage/package.use/python")
-        if options.options.ccache:
+        if options.OPTIONS.ccache:
             self.execute("emerge --verbose dev-util/ccache")
 
     def _get_repo_names(self, overlay_dirs):
@@ -266,11 +266,11 @@ class Docker:
     def _enable_test(self):
         """Enable test FEATURES for ATOM."""
 
-        if options.options.atom is not None:
+        if options.OPTIONS.atom is not None:
             options.log.info("enabling test feature for %s" %
-                             options.options.atom)
+                             options.OPTIONS.atom)
             self.execute("mkdir -p /etc/portage/env")
-            for a in options.options.atom:
+            for a in options.OPTIONS.atom:
                 self.execute(
                     "echo \"%s tester.conf\" >> /etc/portage/package.env" % a)
             self.execute(
@@ -282,10 +282,10 @@ class Docker:
     def _unmask_atom(self):
         """Unmask the atom to install."""
 
-        if options.options.atom is not None:
-            options.log.info("unmasking %s" % options.options.atom)
-            for a in options.options.atom:
-                if options.options.live_ebuild:
+        if options.OPTIONS.atom is not None:
+            options.log.info("unmasking %s" % options.OPTIONS.atom)
+            for a in options.OPTIONS.atom:
+                if options.OPTIONS.live_ebuild:
                     unmask_keyword = "**"
                 else:
                     unmask_keyword = "~amd64"
@@ -293,11 +293,11 @@ class Docker:
                 self.execute(
                     "echo \"" + str(a) + "\" " + unmask_keyword + " >> " +
                     "/etc/portage/package.accept_keywords/testbuild")
-            if len(options.options.use) > 0:
-                for a in options.options.atom:
+            if len(options.OPTIONS.use) > 0:
+                for a in options.OPTIONS.atom:
                     self.execute(
                         "echo %s %s >> /etc/portage/package.use/testbuild" %
-                        (str(a), " ".join(options.options.use)))
+                        (str(a), " ".join(options.OPTIONS.use)))
         else:
             options.log.info("no atoms to unmask")
 
@@ -305,7 +305,7 @@ class Docker:
         """Unmask other atoms."""
 
         options.log.info("unmasking additional atoms")
-        for a in options.options.unmask:
+        for a in options.OPTIONS.unmask:
             options.log.info("  unmasking %s" % a)
             self.execute("mkdir -p /etc/portage/package.accept_keywords")
             self.execute(
@@ -315,7 +315,7 @@ class Docker:
     def _update(self):
         """Update container."""
 
-        if not options.options.update:
+        if not options.OPTIONS.update:
             options.log.info("skipping update")
         else:
             options.log.info("updating container")
@@ -326,7 +326,7 @@ class Docker:
     def _install_basics(self):
         """Install some basic packages."""
 
-        if not options.options.install_basic_packages:
+        if not options.OPTIONS.install_basic_packages:
             options.log.info("skipping basic packages")
         else:
             options.log.info("installing basic packages: %s" %
@@ -336,26 +336,26 @@ class Docker:
 
     def _enable_global_use(self):
         """Enable global USE settings."""
-        if not options.options.global_use:
+        if not options.OPTIONS.global_use:
             options.log.info("no global USE flags given, skipping")
         else:
             options.log.info("setting global USE flags")
             self.execute("emerge --verbose gentoolkit")
-            for u in options.options.global_use:
+            for u in options.OPTIONS.global_use:
                 self.execute("euse --enable %s" % u)
 
     def _set_gcc(self):
         """Set gcc in the container."""
 
         options.log.info("setting gcc")
-        if options.options.gcc_version:
+        if options.OPTIONS.gcc_version:
             self.execute("mkdir -p /etc/portage/package.accept_keywords")
             self.execute(
                 ("echo =sys-devel/gcc-%s ** >> " %
-                 options.options.gcc_version) +
+                 options.OPTIONS.gcc_version) +
                 "/etc/portage/package.accept_keywords/testbuild")
             self.execute("emerge --verbose sys-devel/gcc")
-            gcc = re.sub("-r[0-9]+$", "", options.options.gcc_version)
+            gcc = re.sub("-r[0-9]+$", "", options.OPTIONS.gcc_version)
             self.execute("gcc-config $(gcc-config --list-profiles | " +
                          ("grep %s | " % gcc) +
                          "sed -e 's:^.*\\[\\([0-9]\\+\\)\\].*:\\1:')")

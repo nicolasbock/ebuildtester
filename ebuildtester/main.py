@@ -8,11 +8,11 @@ import sys
 def main():
     """The main function."""
 
-    options.options = parse_commandline(sys.argv[1:])
-    if len(options.options.atom) > 0:
+    options.OPTIONS = parse_commandline(sys.argv[1:])
+    if len(options.OPTIONS.atom) > 0:
         options.set_logfile('ebuildtester-'
                             + ':'.join([f'{atom.category}-{atom.package}'
-                                        for atom in options.options.atom])
+                                        for atom in options.OPTIONS.atom])
                             + '.log')
     else:
         options.set_logfile('ebuildtester-manual.log')
@@ -21,11 +21,11 @@ def main():
         "*** please note that all necessary licenses will be accepted ***")
     options.log.info("creating container")
     container = Docker(
-        os.path.abspath(os.path.expanduser(options.options.portage_dir)),
-        [os.path.abspath(p) for p in options.options.overlay_dir])
+        os.path.abspath(os.path.expanduser(options.OPTIONS.portage_dir)),
+        [os.path.abspath(p) for p in options.OPTIONS.overlay_dir])
 
     options.log.info("created container %s", container.cid)
-    if options.options.manual:
+    if options.OPTIONS.manual:
         container.shell()
     else:
         emerge_command = [
@@ -34,7 +34,7 @@ def main():
             "--autounmask-write=y ",
             "--autounmask-license=y ",
             "--autounmask-continue=y ",
-            " ".join(map(str, options.options.atom))]
+            " ".join(map(str, options.OPTIONS.atom))]
         container.execute(" ".join(["echo"] + emerge_command + ["--ask"]) +
                           " >> ~/.bash_history")
 
@@ -48,7 +48,7 @@ def main():
                 container.execute("etc-update --verbose --automode -5")
             else:
                 break
-        if not options.options.batch:
+        if not options.OPTIONS.batch:
             options.log.info("opening interactive shell")
             container.shell()
 
