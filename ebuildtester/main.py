@@ -1,8 +1,11 @@
+"""The main function."""
+
+import os.path
+import sys
+
 from ebuildtester.docker import Docker, ExecuteFailure
 from ebuildtester.parse import parse_commandline
 import ebuildtester.options as options
-import os.path
-import sys
 
 
 def main():

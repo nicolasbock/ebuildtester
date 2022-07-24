@@ -1,3 +1,5 @@
+"""The Docker backend."""
+
 import os
 import re
 import sys

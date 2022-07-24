@@ -1,8 +1,11 @@
-from ebuildtester.atom import Atom
+"""Parse command line options."""
+
 import os
-from pkg_resources import get_distribution
 import argparse
 import multiprocessing
+from pkg_resources import get_distribution
+
+from ebuildtester.atom import Atom
 
 
 def parse_commandline(args):
