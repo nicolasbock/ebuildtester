@@ -141,6 +141,10 @@ def parse_commandline(args):
         '--batch',
         help='Do not drop into interactive shell',
         action='store_true')
+    parser.add_argument(
+        '--debug',
+        help='Add some debugging output',
+        action='store_true')
 
     if '--complete' in args:
         print('Suggesting')

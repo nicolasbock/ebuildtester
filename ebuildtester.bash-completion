@@ -36,6 +36,7 @@ _ebuildtester() {
       --show-options
       --ccache
       --batch
+      --debug
     )
 
     case "${prev}" in
