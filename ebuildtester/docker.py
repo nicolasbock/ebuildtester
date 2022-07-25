@@ -166,7 +166,7 @@ class Docker:
                ],
                # https://github.com/moby/moby/issues/16429
                "security_opt": ["apparmor=unconfined"],
-               "devices": "/dev/fuse",
+               "devices": ["/dev/fuse"],
                "working_dir": "/root",
                "volumes": [
                    "%s:/var/db/repos/gentoo" % local_portage,
