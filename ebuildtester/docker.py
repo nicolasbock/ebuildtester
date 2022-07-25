@@ -137,7 +137,7 @@ class Docker:
                 break
             options.log.info("%s (%s): %s" %
                              (self.cid[:6], name, out.rstrip()))
-            options.log_ch.flush()
+            options._log_ch.flush()
 
     def _setup_container(self, docker_image):
         """Setup the container."""

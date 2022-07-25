@@ -20,6 +20,9 @@ def main():
     else:
         options.set_logfile('ebuildtester-manual.log')
 
+    if options.OPTIONS.debug:
+        options.set_debugLoglevel()
+
     options.log.info(
         "*** please note that all necessary licenses will be accepted ***")
     options.log.info("creating container")
