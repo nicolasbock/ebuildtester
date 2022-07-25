@@ -4,6 +4,7 @@ import os
 import re
 import sys
 import docker
+import docker.errors
 
 import ebuildtester.options as options
 from ebuildtester.utils import massage_string
@@ -186,19 +187,15 @@ class Docker:
             docker_args["volume"] = f'{o}:{o}'
 
         options.log.info("creating docker container with: %s", docker_args)
-        self.docker_client.containers.create(self.docker_image, **docker_args)
+        try:
+            self.container = self.docker_client.containers.create(
+                self.docker_image, **docker_args)
+        except docker.errors.ImageNotFound as e:
+            raise e
+        except docker.errors.APIError as e:
+            raise e
 
-        docker = subprocess.Popen(docker_args, stdout=subprocess.PIPE)
-        docker.wait()
-
-        if docker.returncode != 0:
-            raise Exception("failure creating docker container")
-
-        lines = docker.stdout.readlines()
-        if len(lines) > 1:
-            raise Exception("more output than expected")
-        self.cid = massage_string(lines[0]).strip()
-        options.log.info("container id %s" % (self.cid))
+        options.log.info("container id %s" % (self.container.id))
 
     def _start_container(self):
         """Start the container."""
