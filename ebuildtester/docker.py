@@ -157,17 +157,17 @@ class Docker:
         """Create new container."""
 
         docker_args = {
-               "--tty": None,
-               "--cap-add": [
+               "tty": None,
+               "cap_add": [
                    "CAP_SYS_ADMIN",
                    "CAP_MKNOD",
                    "CAP_NET_ADMIN",
                ],
                # https://github.com/moby/moby/issues/16429
-               "--security-opt": "apparmor:unconfined",
-               "--device": "/dev/fuse",
-               "--workdir": "/root",
-               "--volume": [
+               "security_opt": ["apparmor:unconfined"],
+               "devices": "/dev/fuse",
+               "working_dir": "/root",
+               "volumes": [
                    "%s:/var/db/repos/gentoo" % local_portage,
                    "%s/distfiles:/var/cache/distfiles" % local_portage,
                    "%s/packages:/var/cache/binpkgs" % local_portage,
@@ -176,18 +176,16 @@ class Docker:
 
         if options.OPTIONS.storage_opt:
             for s in options.OPTIONS.storage_opt:
-                docker_args += ["--storage-opt", "%s" % s]
+                docker_args["storage-opt"] = f"{s}"
 
         ccache = options.OPTIONS.ccache
         if ccache:
-            docker_args += ["--volume=%s:/var/tmp/ccache" % ccache]
+            docker_args["volume"] = f'{ccache}:/var/tmp/ccache'
 
         for o in overlays:
-            docker_args += ["--volume=%s:%s" % o]
+            docker_args["volume"] = f'{o}:{o}'
 
-        docker_args += [self.docker_image_name]
-        options.log.info("creating docker container with: %s",
-                         " ".join(docker_args))
+        options.log.info("creating docker container with: %s", docker_args)
         self.docker_client.containers.create(self.docker_image, **docker_args)
 
         docker = subprocess.Popen(docker_args, stdout=subprocess.PIPE)
