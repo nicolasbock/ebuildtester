@@ -158,14 +158,14 @@ class Docker:
         """Create new container."""
 
         docker_args = {
-               "tty": None,
+               "tty": True,
                "cap_add": [
                    "CAP_SYS_ADMIN",
                    "CAP_MKNOD",
                    "CAP_NET_ADMIN",
                ],
                # https://github.com/moby/moby/issues/16429
-               "security_opt": ["apparmor:unconfined"],
+               "security_opt": ["apparmor=unconfined"],
                "devices": "/dev/fuse",
                "working_dir": "/root",
                "volumes": [
@@ -200,12 +200,11 @@ class Docker:
     def _start_container(self):
         """Start the container."""
 
-        docker_args = options.OPTIONS.docker_command \
-            + ["start", "%s" % self.cid]
-        docker = subprocess.Popen(docker_args, stdout=subprocess.PIPE)
-        docker.wait()
-        if docker.returncode != 0:
-            raise Exception("failure creating docker container")
+        options.log.debug(f'starting container {self.container.id}')
+        try:
+            self.container.start()
+        except docker.errors.APIError as e:
+            raise e
 
     def _set_profile(self):
         """Set the Gentoo profile."""
