@@ -2,36 +2,33 @@
 
 import os
 import re
-import sys
 import docker
-import docker.errors
 
 import ebuildtester.options as options
 from ebuildtester.utils import massage_string
+from ebuildtester.container import Container
 
 
-class ExecuteFailure(Exception):
-    """Failure to execute command."""
-    pass
-
-
-class Docker:
+class Docker(Container):
     """The Docker class."""
     def __init__(self, local_portage, overlay_dirs):
         """Create a new container."""
 
-        self.docker_client = docker.client.from_env()
         self.docker_image_name = options.OPTIONS.docker_image
         self.docker_image = None
         repo_names = self._get_repo_names(overlay_dirs)
         overlay_mountpoints = [os.path.join("/var/lib/overlays", r)
                                for r in repo_names]
 
+        self.docker_client = docker.client.from_env()
+        self.docker_client.ping()
+
         self._setup_container()
         self._create_container(local_portage,
                                zip(overlay_dirs, overlay_mountpoints))
         self._start_container()
         self._set_profile()
+        return
         self._enable_global_use()
         self._tweak_settings()
         self._enable_overlays(repo_names)
@@ -50,61 +47,18 @@ class Docker:
         executed within a bash shell.
         """
 
-        if isinstance(cmd, list):
-            cmd_string = ' '.join(cmd)
-        else:
-            cmd_string = cmd
-        options.log.info("%s %s", self.cid[:6], cmd)
-        docker_cmd = options.OPTIONS.docker_command + ["exec", "--interactive"]
-        docker_cmd += [self.cid, "/bin/bash"]
-        docker = subprocess.Popen(docker_cmd,
-                                  stdout=subprocess.PIPE,
-                                  stderr=subprocess.PIPE,
-                                  stdin=subprocess.PIPE,
-                                  universal_newlines=True)
-        docker.stdin.write(cmd_string + "\n")
-        docker.stdin.close()
-
-        stdout_reader = os.fork()
-        if stdout_reader == 0:
-            try:
-                self._reader(docker, docker.stdout, "stdout")
-            except KeyboardInterrupt:
-                pass
-            sys.exit(0)
-
-        stderr_reader = os.fork()
-        if stderr_reader == 0:
-            try:
-                self._reader(docker, docker.stderr, "stderr")
-            except KeyboardInterrupt:
-                pass
-            sys.exit(0)
-
-        try:
-            os.waitid(os.P_PID, stdout_reader, os.WEXITED)
-            os.waitid(os.P_PID, stderr_reader, os.WEXITED)
-            docker.wait()
-        except KeyboardInterrupt:
-            try:
-                options.log.info("received keyboard interrupt")
-                docker.terminate()
-                self.shell()
-                options.log.info("return from shell, initiating shutdown")
-                self.cleanup()
-                sys.exit(0)
-            except OSError:
-                pass
-            docker.wait()
-
-        if docker.returncode != 0:
-            options.log.error("running in container %s" % (str(self.cid)))
-            options.log.error("failed command \"%s\"" % (cmd))
+        if isinstance(cmd, str):
+            cmd = [c.strip() for c in cmd.split()]
+        options.log.info("%s %s", self.container.id[:6], cmd)
+        _, output = self.container.exec_run(cmd, demux=False, tty=True, stream=True)
+        for line in output:
+            options.log.info(line.decode('utf-8').rstrip())
 
     def shell(self):
         """Run an interactive shell in container."""
 
         options.log.info("running interactive shell in container")
+
         docker = subprocess.Popen(options.OPTIONS.docker_command
                                   + ["exec", "--tty", "--interactive",
                                      self.cid, "/bin/bash"])
