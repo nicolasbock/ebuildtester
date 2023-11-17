@@ -27,11 +27,21 @@ Requirements
 ------------
 
 Using require `Docker <https://wiki.gentoo.org/wiki/Docker>`_ and `FUSE
-<https://wiki.gentoo.org/wiki/Filesystem_in_Userspace>`_. Docker must be
-configured to use the `devicemapper
-<https://docs.docker.com/storage/storagedriver/device-mapper-driver/>`_
-storage driver.  This can be achieved with the following inside
-``/etc/docker/daemon.json``:
+<https://wiki.gentoo.org/wiki/Filesystem_in_Userspace>`_.
+
+If you plan to use specific storage driver options (by passing
+``--storage-opt``), be aware that these are specific to the `configured Docker
+storage driver
+<https://docs.docker.com/storage/storagedriver/select-storage-driver/>`__. Refer
+to the Docker documentation about `storage drivers
+<https://docs.docker.com/storage/storagedriver/>`_ for more information.
+Particularly see the list of `options per storage driver
+<https://docs.docker.com/engine/reference/commandline/dockerd/#options-per-storage-driver>`_.
+
+System-wide configuration of the storage driver used by Docker is done in
+``/etc/docker/daemon.json``. For example, to select the `devicemapper
+<https://docs.docker.com/storage/storagedriver/device-mapper-driver/>`_ storage
+driver, specify:
 
 .. code-block:: javascript
 
