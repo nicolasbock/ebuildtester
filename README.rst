@@ -11,7 +11,7 @@ the ebuild is emerged in a clean (and current) stage3 Docker container.
    :target: http://ebuildtester.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status
 
-.. image:: https://github.com/nicolasbock/ebuildtester/workflows/build/badge.svg
+.. image:: https://github.com/nicolasbock/ebuildtester/actions/workflows/build.yaml/badge.svg
    :target: https://github.com/nicolasbock/ebuildtester/actions?query=workflow%3Abuild
    :alt: GitHub Actions
 
