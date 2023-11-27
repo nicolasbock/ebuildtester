@@ -3,7 +3,8 @@
 import os.path
 import sys
 
-from ebuildtester.docker import Docker, ExecuteFailure
+from ebuildtester.docker import Docker
+from ebuildtester.container import ExecuteFailure
 from ebuildtester.parse import parse_commandline
 import ebuildtester.options as options
 
@@ -26,20 +27,21 @@ def main():
     options.log.info(
         "*** please note that all necessary licenses will be accepted ***")
     options.log.info("creating container")
+
     container = Docker(
         os.path.abspath(os.path.expanduser(options.OPTIONS.portage_dir)),
         [os.path.abspath(p) for p in options.OPTIONS.overlay_dir])
 
-    options.log.info("created container %s", container.cid)
+    options.log.info("created container %s", container.container.id)
     if options.OPTIONS.manual:
         container.shell()
     else:
         emerge_command = [
             "emerge",
-            "--verbose ",
-            "--autounmask-write=y ",
-            "--autounmask-license=y ",
-            "--autounmask-continue=y ",
+            "--verbose",
+            "--autounmask-write=y",
+            "--autounmask-license=y",
+            "--autounmask-continue=y",
             " ".join(map(str, options.OPTIONS.atom))]
         container.execute(" ".join(["echo"] + emerge_command + ["--ask"]) +
                           " >> ~/.bash_history")

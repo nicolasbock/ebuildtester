@@ -2,33 +2,33 @@
 
 import os
 import re
-import sys
-import subprocess
+import docker
 
 import ebuildtester.options as options
 from ebuildtester.utils import massage_string
+from ebuildtester.container import Container
 
 
-class ExecuteFailure(Exception):
-    """Failure to execute command."""
-    pass
-
-
-class Docker:
+class Docker(Container):
     """The Docker class."""
     def __init__(self, local_portage, overlay_dirs):
         """Create a new container."""
 
-        docker_image = options.OPTIONS.docker_image
+        self.docker_image_name = options.OPTIONS.docker_image
+        self.docker_image = None
         repo_names = self._get_repo_names(overlay_dirs)
         overlay_mountpoints = [os.path.join("/var/lib/overlays", r)
                                for r in repo_names]
 
-        self._setup_container(docker_image)
-        self._create_container(docker_image, local_portage,
+        self.docker_client = docker.client.from_env()
+        self.docker_client.ping()
+
+        self._setup_container()
+        self._create_container(local_portage,
                                zip(overlay_dirs, overlay_mountpoints))
         self._start_container()
         self._set_profile()
+        return
         self._enable_global_use()
         self._tweak_settings()
         self._enable_overlays(repo_names)
@@ -47,61 +47,18 @@ class Docker:
         executed within a bash shell.
         """
 
-        if isinstance(cmd, list):
-            cmd_string = ' '.join(cmd)
-        else:
-            cmd_string = cmd
-        options.log.info("%s %s", self.cid[:6], cmd)
-        docker_cmd = options.OPTIONS.docker_command + ["exec", "--interactive"]
-        docker_cmd += [self.cid, "/bin/bash"]
-        docker = subprocess.Popen(docker_cmd,
-                                  stdout=subprocess.PIPE,
-                                  stderr=subprocess.PIPE,
-                                  stdin=subprocess.PIPE,
-                                  universal_newlines=True)
-        docker.stdin.write(cmd_string + "\n")
-        docker.stdin.close()
-
-        stdout_reader = os.fork()
-        if stdout_reader == 0:
-            try:
-                self._reader(docker, docker.stdout, "stdout")
-            except KeyboardInterrupt:
-                pass
-            sys.exit(0)
-
-        stderr_reader = os.fork()
-        if stderr_reader == 0:
-            try:
-                self._reader(docker, docker.stderr, "stderr")
-            except KeyboardInterrupt:
-                pass
-            sys.exit(0)
-
-        try:
-            os.waitid(os.P_PID, stdout_reader, os.WEXITED)
-            os.waitid(os.P_PID, stderr_reader, os.WEXITED)
-            docker.wait()
-        except KeyboardInterrupt:
-            try:
-                options.log.info("received keyboard interrupt")
-                docker.terminate()
-                self.shell()
-                options.log.info("return from shell, initiating shutdown")
-                self.cleanup()
-                sys.exit(0)
-            except OSError:
-                pass
-            docker.wait()
-
-        if docker.returncode != 0:
-            options.log.error("running in container %s" % (str(self.cid)))
-            options.log.error("failed command \"%s\"" % (cmd))
+        if isinstance(cmd, str):
+            cmd = [c.strip() for c in cmd.split()]
+        options.log.info("%s %s", self.container.id[:6], cmd)
+        _, output = self.container.exec_run(cmd, demux=False, tty=True, stream=True)
+        for line in output:
+            options.log.info(line.decode('utf-8').rstrip())
 
     def shell(self):
         """Run an interactive shell in container."""
 
         options.log.info("running interactive shell in container")
+
         docker = subprocess.Popen(options.OPTIONS.docker_command
                                   + ["exec", "--tty", "--interactive",
                                      self.cid, "/bin/bash"])
@@ -139,67 +96,69 @@ class Docker:
                              (self.cid[:6], name, out.rstrip()))
             options._log_ch.flush()
 
-    def _setup_container(self, docker_image):
+    def _setup_container(self):
         """Setup the container."""
 
         if options.OPTIONS.pull:
-            docker_args = options.OPTIONS.docker_command \
-                + ["pull", docker_image]
-            docker = subprocess.Popen(docker_args)
-            docker.wait()
+            options.log.info(f'pulling image {self.docker_image_name}')
+            self.docker_image = self.docker_client \
+                .images.pull(self.docker_image_name)
+        else:
+            self.docker_image = self.docker_client.images \
+                .get(self.docker_image_name)
+        options.log.debug('image = %s', self.docker_image)
 
-    def _create_container(self, docker_image, local_portage, overlays):
+    def _create_container(self, local_portage, overlays):
         """Create new container."""
 
-        docker_args = options.OPTIONS.docker_command \
-            + ["create",
-               "--tty",
-               "--cap-add", "CAP_SYS_ADMIN",
-               "--cap-add", "CAP_MKNOD",
-               "--cap-add", "CAP_NET_ADMIN",
+        docker_args = {
+               "tty": True,
+               "cap_add": [
+                   "CAP_SYS_ADMIN",
+                   "CAP_MKNOD",
+                   "CAP_NET_ADMIN",
+               ],
                # https://github.com/moby/moby/issues/16429
-               "--security-opt", "apparmor:unconfined",
-               "--device", "/dev/fuse",
-               "--workdir", "/root",
-               "--volume", "%s:/var/db/repos/gentoo" % local_portage,
-               "--volume", "%s/distfiles:/var/cache/distfiles" % local_portage,
-               "--volume", "%s/packages:/var/cache/binpkgs" % local_portage]
+               "security_opt": ["apparmor=unconfined"],
+               "devices": ["/dev/fuse"],
+               "working_dir": "/root",
+               "volumes": [
+                   "%s:/var/db/repos/gentoo" % local_portage,
+                   "%s/distfiles:/var/cache/distfiles" % local_portage,
+                   "%s/packages:/var/cache/binpkgs" % local_portage,
+               ],
+        }
 
         if options.OPTIONS.storage_opt:
             for s in options.OPTIONS.storage_opt:
-                docker_args += ["--storage-opt", "%s" % s]
+                docker_args["storage-opt"] = f"{s}"
 
         ccache = options.OPTIONS.ccache
         if ccache:
-            docker_args += ["--volume=%s:/var/tmp/ccache" % ccache]
+            docker_args["volume"] = f'{ccache}:/var/tmp/ccache'
 
         for o in overlays:
-            docker_args += ["--volume=%s:%s" % o]
+            docker_args["volume"] = f'{o}:{o}'
 
-        docker_args += [docker_image]
-        options.log.info("creating docker container with: %s" %
-                         " ".join(docker_args))
-        docker = subprocess.Popen(docker_args, stdout=subprocess.PIPE)
-        docker.wait()
+        options.log.info("creating docker container with: %s", docker_args)
+        try:
+            self.container = self.docker_client.containers.create(
+                self.docker_image, **docker_args)
+        except docker.errors.ImageNotFound as e:
+            raise e
+        except docker.errors.APIError as e:
+            raise e
 
-        if docker.returncode != 0:
-            raise Exception("failure creating docker container")
-
-        lines = docker.stdout.readlines()
-        if len(lines) > 1:
-            raise Exception("more output than expected")
-        self.cid = massage_string(lines[0]).strip()
-        options.log.info("container id %s" % (self.cid))
+        options.log.info("container id %s" % (self.container.id))
 
     def _start_container(self):
         """Start the container."""
 
-        docker_args = options.OPTIONS.docker_command \
-            + ["start", "%s" % self.cid]
-        docker = subprocess.Popen(docker_args, stdout=subprocess.PIPE)
-        docker.wait()
-        if docker.returncode != 0:
-            raise Exception("failure creating docker container")
+        options.log.debug(f'starting container {self.container.id}')
+        try:
+            self.container.start()
+        except docker.errors.APIError as e:
+            raise e
 
     def _set_profile(self):
         """Set the Gentoo profile."""
