@@ -3,6 +3,7 @@
 import os.path
 import sys
 
+from ebuildtester.atom import Atom
 from ebuildtester.docker import Docker, ExecuteFailure
 from ebuildtester.parse import parse_commandline
 import ebuildtester.options as options
@@ -39,8 +40,15 @@ def main():
             "--verbose ",
             "--autounmask-write=y ",
             "--autounmask-license=y ",
-            "--autounmask-continue=y ",
-            " ".join(map(str, options.OPTIONS.atom))]
+            "--autounmask-continue=y "]
+
+        atom = Atom(" ".join(map(str, options.OPTIONS.atom)))
+
+        if options.OPTIONS.binhost:
+            p = "{}/{}".format(atom.category, atom.package)
+            emerge_command.append("--usepkg-exclude={}".format(p))
+
+        emerge_command.append(str(atom))
         container.execute(" ".join(["echo"] + emerge_command + ["--ask"]) +
                           " >> ~/.bash_history")
 
