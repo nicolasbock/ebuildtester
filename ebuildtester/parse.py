@@ -3,7 +3,7 @@
 import os
 import argparse
 import multiprocessing
-from pkg_resources import get_distribution
+from importlib.metadata import version
 
 from ebuildtester.atom import Atom
 
@@ -17,7 +17,7 @@ def parse_commandline(args):
     parser.add_argument(
         "--version",
         action="version",
-        version="v" + get_distribution("ebuildtester").version)
+        version="v" + version("ebuildtester"))
     parser.add_argument(
         "--atom",
         help="The package atom(s) to install",
