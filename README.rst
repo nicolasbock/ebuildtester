@@ -123,7 +123,7 @@ The command understands the following command line arguments:
                            Storage driver options for all volumes (same as Docker param)
      --with-X              Globally enable the X USE flag
      --with-vnc            Install VNC server to test graphical applications
-     --profile PROFILE     The profile to use (default = default/linux/amd64/17.1)
+     --profile PROFILE     The profile to use (default = default/linux/amd64/23.0)
      --features FEATURES [FEATURES ...]
                            Set FEATURES, see https://wiki.gentoo.org/wiki/FEATURES (default = ['-sandbox',
                            '-usersandbox', 'userfetch'])
