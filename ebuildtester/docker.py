@@ -240,8 +240,9 @@ class Docker:
             self.execute(("echo */* PYTHON_TARGETS: %s" %
                           (options.OPTIONS.python_targets)) +
                          " >> /etc/portage/package.use/python")
-        if options.OPTIONS.ccache:
-            self.execute("emerge --verbose dev-util/ccache")
+
+        # Avoid wasting time generating the whole set
+        self.execute('echo "C.UTF-8 UTF-8" > /etc/locale.gen')
 
     def _get_repo_names(self, overlay_dirs):
         """Get repo names from local overlay settings."""
@@ -327,6 +328,9 @@ class Docker:
 
     def _install_basics(self):
         """Install some basic packages."""
+
+        if options.OPTIONS.ccache:
+            self.execute("emerge --verbose dev-util/ccache")
 
         if not options.OPTIONS.install_basic_packages:
             options.log.info("skipping basic packages")
