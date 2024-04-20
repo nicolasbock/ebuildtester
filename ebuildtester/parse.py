@@ -110,7 +110,7 @@ def parse_commandline(args):
     parser.add_argument(
         "--profile",
         help="The profile to use (default = %(default)s)",
-        default="default/linux/amd64/17.1")
+        default="default/linux/amd64/23.0")
     parser.add_argument(
         '--features',
         help="Set FEATURES, see https://wiki.gentoo.org/wiki/FEATURES "
