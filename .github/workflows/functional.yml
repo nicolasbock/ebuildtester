@@ -27,7 +27,6 @@ jobs:
       - name: Install
         run: |
           sudo apt install python3-pip
-          sudo pip install -r requirements.txt
           pip list --verbose
           python3 setup.py install
 
