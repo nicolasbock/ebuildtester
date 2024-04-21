@@ -223,8 +223,11 @@ class Docker:
                       (options.OPTIONS.threads)) +
                      ">> /etc/portage/make.conf")
         if options.OPTIONS.binhost:
-            self.execute("echo PORTAGE_BINHOST=\\\"{}\\\""
-                         ">> /etc/portage/make.conf"
+            self.execute("getuto")
+            self.execute("echo -e '[ebuildtester]\n"
+                         "priority = 999\n"
+                         "sync-uri = {}\n'"
+                         ">> /etc/portage/binrepos.conf/ebuildtester.conf"
                          .format(options.OPTIONS.binhost))
         if options.OPTIONS.unstable:
             self.execute("echo ACCEPT_KEYWORDS=\\\"~amd64\\\" " +
