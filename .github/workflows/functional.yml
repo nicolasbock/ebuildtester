@@ -15,12 +15,12 @@ jobs:
     name: Functional testing
     steps:
       - name: Check out sources
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
@@ -51,7 +51,7 @@ jobs:
         run: docker ps --all
 
       - name: Archive test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ebuildtester log
           path: |
