@@ -80,13 +80,6 @@ class TestParse(unittest.TestCase):
             self.args + ["--manual", "--python-targets", "python3_8"])
         self.assertEqual("python3_8", options.python_targets)
 
-    def test_with_vnc(self):
-        options = ebuildtester.parse.parse_commandline(
-            self.args + ["--manual", "--with-vnc"])
-        self.assertTrue(options.with_vnc)
-        self.assertTrue(Atom("net-misc/tigervnc") in options.atom)
-        self.assertTrue(Atom("x11-wm/icewm") in options.atom)
-
     def test_docker_image(self):
         options = ebuildtester.parse.parse_commandline(
             self.args + ["--manual"])

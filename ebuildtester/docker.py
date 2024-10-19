@@ -343,6 +343,11 @@ class Docker:
             self.execute("emerge --verbose %s" %
                          " ".join(map(str, options.base_packages)))
 
+        if options.OPTIONS.with_vnc:
+            t = ["net-misc/tigervnc", "x11-wm/icewm"]
+            options.log.info("installing VNC packages: %s" % t)
+            self.execute("emerge --verbose %s" % " ".join(map(str, t)))
+
     def _enable_global_use(self):
         """Enable global USE settings."""
         if not options.OPTIONS.global_use:

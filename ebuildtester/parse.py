@@ -178,9 +178,6 @@ def parse_commandline(args):
     if options.ccache:
         options.features.append("ccache")
 
-    if options.with_vnc:
-        options.atom += ["net-misc/tigervnc", "x11-wm/icewm"]
-
     options.atom = list(map(Atom, options.atom))
 
     if options.update in ["yes", "true"]:
