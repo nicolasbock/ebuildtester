@@ -8,7 +8,7 @@ from importlib.metadata import version
 from ebuildtester.atom import Atom
 
 
-def parse_commandline(args):
+def parse_commandline(args, d):
     """Parse the command line."""
 
     parser = argparse.ArgumentParser(
@@ -38,7 +38,7 @@ def parse_commandline(args):
     parser.add_argument(
         "--portage-dir",
         help="The local portage directory",
-        required=True)
+        required="portage_dir" not in d)
     parser.add_argument(
         "--overlay-dir",
         help="Add overlay dir (can be used multiple times)",
@@ -145,6 +145,7 @@ def parse_commandline(args):
         '--debug',
         help='Add some debugging output',
         action='store_true')
+    parser.set_defaults(**d)
 
     if '--complete' in args:
         print('Suggesting')
