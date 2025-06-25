@@ -42,13 +42,15 @@ def main():
             "--autounmask-license=y ",
             "--autounmask-continue=y "]
 
-        atom = Atom(" ".join(map(str, options.OPTIONS.atom)))
+        atoms = [Atom(str(a)) for a in options.OPTIONS.atom]
 
         if options.OPTIONS.binhost:
-            p = "{}/{}".format(atom.category, atom.package)
-            emerge_command.append("--usepkg-exclude={}".format(p))
+            for a in atoms:
+                p = "{}/{}".format(a.category, a.package)
+                emerge_command.append("--usepkg-exclude={}".format(p))
 
-        emerge_command.append(str(atom))
+        for a in atoms:
+            emerge_command.append(str(a))
         container.execute(" ".join(["echo"] + emerge_command + ["--ask"]) +
                           " >> ~/.bash_history")
 
