@@ -151,6 +151,12 @@ class Docker:
     def _create_container(self, docker_image, local_portage, overlays):
         """Create new container."""
 
+        distdir = "{}/distfiles".format(local_portage)
+        os.makedirs(distdir, exist_ok=True)
+
+        pkgdir = "{}/packages".format(local_portage)
+        os.makedirs(pkgdir, exist_ok=True)
+
         docker_args = options.OPTIONS.docker_command \
             + ["create",
                "--tty",
@@ -162,8 +168,8 @@ class Docker:
                "--device", "/dev/fuse",
                "--workdir", "/root",
                "--volume", "%s:/var/db/repos/gentoo" % local_portage,
-               "--volume", "%s/distfiles:/var/cache/distfiles" % local_portage,
-               "--volume", "%s/packages:/var/cache/binpkgs" % local_portage]
+               "--volume", "%s:/var/cache/distfiles" % distdir,
+               "--volume", "%s:/var/cache/binpkgs" % pkgdir]
 
         if options.OPTIONS.storage_opt:
             for s in options.OPTIONS.storage_opt:
