@@ -44,14 +44,12 @@ jobs:
           ebuildtester --portage-dir ~/gentoo \
             --rm \
             --pull \
-            --ccache /var/tmp/ccache \
             --atom app-editors/nano
           ebuildtester --portage-dir ~/gentoo \
             --docker-command podman \
             --docker-image docker.io/gentoo/stage3 \
             --rm \
             --pull \
-            --ccache /var/tmp/ccache \
             --atom app-editors/nano
 
       - name: Test whether any container is still running
