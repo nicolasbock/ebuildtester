@@ -42,12 +42,14 @@ jobs:
       - name: Testbuild of `nano`
         run: |
           ebuildtester --portage-dir ~/gentoo \
+            --batch \
             --rm \
             --pull \
             --atom app-editors/nano
           ebuildtester --portage-dir ~/gentoo \
             --docker-command podman \
             --docker-image docker.io/gentoo/stage3 \
+            --batch \
             --rm \
             --pull \
             --atom app-editors/nano
