@@ -4,6 +4,7 @@ import os.path
 import sys
 
 from ebuildtester.atom import Atom
+from ebuildtester.config import ConfigFile
 from ebuildtester.docker import Docker, ExecuteFailure
 from ebuildtester.parse import parse_commandline
 import ebuildtester.options as options
@@ -12,7 +13,8 @@ import ebuildtester.options as options
 def main():
     """The main function."""
 
-    options.OPTIONS = parse_commandline(sys.argv[1:])
+    cfg = ConfigFile()
+    options.OPTIONS = parse_commandline(sys.argv[1:], cfg.get_cfg())
     if len(options.OPTIONS.atom) > 0:
         options.set_logfile('ebuildtester-'
                             + ':'.join([f'{atom.category}-{atom.package}'

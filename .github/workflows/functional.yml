@@ -28,6 +28,7 @@ jobs:
         run: |
           sudo apt install python3-pip
           pip list --verbose
+          pip install -r requirements.txt
           python3 setup.py install
 
       - name: Clone portage

@@ -135,3 +135,21 @@ The command understands the following command line arguments:
      --show-options        Show currently selected options and defaults
      --ccache CCACHE_DIR   Path to mount that contains ccache cache
      --batch               Do not drop into interactive shell
+
+It is also possible to store default values in a toml configuration file at `~/.config/ebuildtester/config.toml`.
+The next example shows all the configuration options that are currently available:
+
+.. code-block:: toml
+
+    portage_dir = "/var/db/repos/gentoo"
+    overlay_dir = ["/var/db/repos/guru"]
+
+    features = ["sandbox", "usersandbox", "userfetch"]
+
+    install_basic_packages = false
+    docker_command = "docker"
+    unstable = true
+    update = true
+    batch = false
+    pull = true
+    rm = true
