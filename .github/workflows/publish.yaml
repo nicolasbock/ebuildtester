@@ -1,40 +1,56 @@
 ---
-
 name: Publish PyPI Package
 
 on:
-  release:
-    types: [created]
+  push:
   workflow_dispatch:
 
 jobs:
-  publish:
+  build:
     runs-on: ubuntu-latest
     name: Publish PyPI Package
     steps:
+      - name: Check out sources
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Check out sources
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
+      - name: Install pip
+        run: sudo apt install --yes python3-pip
 
-    - name: Get tox environment
-      run: |
-        tox_environment="py310"
-        echo "tox_environment=${tox_environment}" >> $GITHUB_ENV
+      - name: Build and test
+        run: |
+          python3 -m pip install --upgrade setuptools wheel
+          python3 setup.py sdist bdist_wheel
 
-    - name: Install tox
-      run: sudo apt install --yes tox
+      - name: Store the distribution packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
 
-    - name: Publish PyPI Package
-      env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run: |
-        tox -e pypi
-        .tox/pypi/bin/twine upload .tox/pypi/dist/*
+  publish-to-pypi:
+    name: Publish Python 🐍 distribution 📦 to PyPI
+    if: startsWith(github.ref, 'refs/tags/') # only publish to PyPI on tag pushes
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/ebuildtester
+    permissions:
+      id-token: write # IMPORTANT: mandatory for trusted publishing
+
+    steps:
+      - name: Download all the dists
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+      - name: Publish distribution 📦 to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
