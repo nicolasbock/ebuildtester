@@ -1,6 +1,7 @@
 name: ebuildtester
 base: core22
 adopt-info: ebuildtester
+icon: ebuildtester-logo.png
 summary: Tool to test a Gentoo ebuild and its dependencies
 description: |
   This is a tool to test a Gentoo ebuild and its dependencies. The idea is
