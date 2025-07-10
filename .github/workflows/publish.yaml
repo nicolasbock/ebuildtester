@@ -9,6 +9,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     name: Publish PyPI Package
+    permissions:
+      contents: read
     steps:
       - name: Check out sources
         uses: actions/checkout@v4
@@ -44,6 +46,7 @@ jobs:
       name: pypi
       url: https://pypi.org/p/ebuildtester
     permissions:
+      contents: read
       id-token: write # IMPORTANT: mandatory for trusted publishing
 
     steps:
