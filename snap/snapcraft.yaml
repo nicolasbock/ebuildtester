@@ -69,7 +69,7 @@ parts:
     source-branch: main
     override-pull: |
       snapcraftctl pull
-      snapcraftctl set-version "$(git describe)"
+      snapcraftctl set-version "$(git describe --tags --always)"
     python-requirements:
       - requirements.txt
 
