@@ -26,8 +26,14 @@ the ebuild is emerged in a clean (and current) stage3 Docker container.
 Requirements
 ------------
 
-Using require `Docker <https://wiki.gentoo.org/wiki/Docker>`_ and `FUSE
-<https://wiki.gentoo.org/wiki/Filesystem_in_Userspace>`_.
+Using requirements are:
+
+- Python 3.10 or later,
+- `Docker <https://www.docker.com/>`_
+  (or any Docker-compatible tool like `Podman <https://podman.io/>`_),
+- `FUSE <https://wiki.gentoo.org/wiki/Filesystem_in_Userspace>`_,
+- `appdirs <https://github.com/ActiveState/appdirs/>`_,
+- `tomli <https://github.com/hukkin/tomli>`_.
 
 If you plan to use specific storage driver options (by passing
 ``--storage-opt``), be aware that these are specific to the `configured Docker
