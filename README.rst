@@ -52,14 +52,11 @@ driver, specify:
 Usage
 -----
 
-We are going to assume that the user has a local git clone of the portage tree in
-
-.. code-block:: console
-
-   /usr/local/git/gentoo
+We are going to assume that the user has a local git clone of the
+portage tree in ``/usr/local/git/gentoo``.
 
 We have added a new ebuild and would like to verify that the build
-dependencies are all correct. We can build the package (ATOM) with:
+dependencies are all correct. We can build the package (``ATOM``) with:
 
 .. code-block:: console
 
@@ -67,11 +64,10 @@ dependencies are all correct. We can build the package (ATOM) with:
      --atom ATOM \
      --use USE1 USE2
 
-where we have specified two USE flags, USE1 and USE2. The
-`ebuildtester` command will now create a docker container and start
-installing the ATOM. All specified dependencies will be installed as
+where we have specified two USE flags, ``USE1`` and ``USE2``. The
+``ebuildtester`` command will now create a docker container and start
+installing the ``ATOM``. All specified dependencies will be installed as
 well.
-
 
 Command line arguments
 ----------------------
@@ -136,7 +132,7 @@ The command understands the following command line arguments:
      --ccache CCACHE_DIR   Path to mount that contains ccache cache
      --batch               Do not drop into interactive shell
 
-It is also possible to store default values in a toml configuration file at `~/.config/ebuildtester/config.toml`.
+It is also possible to store default values in a TOML configuration file at ``~/.config/ebuildtester/config.toml``.
 The next example shows all the configuration options that are currently available:
 
 .. code-block:: toml
