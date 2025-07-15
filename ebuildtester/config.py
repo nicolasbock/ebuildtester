@@ -1,5 +1,5 @@
 import tomli
-from appdirs import user_config_dir
+from platformdirs import user_config_dir
 
 
 class ConfigFile:
