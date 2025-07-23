@@ -56,9 +56,6 @@ _ebuildtester() {
         *)
             if [[ ${cur} =~ ^-.* || ${COMP_CWORD} -eq 1 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts[*]}" -- ${cur}) )
-            else
-                echo "I should not be here"
-                exit 1
             fi
             ;;
     esac
