@@ -32,7 +32,7 @@ Using requirements are:
 - `Docker <https://www.docker.com/>`_
   (or any Docker-compatible tool like `Podman <https://podman.io/>`_),
 - `FUSE <https://wiki.gentoo.org/wiki/Filesystem_in_Userspace>`_,
-- `appdirs <https://github.com/ActiveState/appdirs/>`_,
+- `platformdirs <https://github.com/tox-dev/platformdirs/>`_,
 - `tomli <https://github.com/hukkin/tomli>`_.
 
 If you plan to use specific storage driver options (by passing

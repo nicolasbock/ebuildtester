@@ -1,2 +1,2 @@
 tomli
-appdirs
+platformdirs
