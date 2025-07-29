@@ -4,6 +4,7 @@ import os
 import re
 import sys
 import subprocess
+from platformdirs import user_cache_dir
 
 import ebuildtester.options as options
 from ebuildtester.utils import massage_string
@@ -151,10 +152,14 @@ class Docker:
     def _create_container(self, docker_image, local_portage, overlays):
         """Create new container."""
 
-        distdir = "{}/distfiles".format(local_portage)
+
+        cache_dir = user_cache_dir("ebuildtester")
+        os.makedirs(cache_dir, exist_ok=True)
+
+        distdir = "{}/distfiles".format(cache_dir)
         os.makedirs(distdir, exist_ok=True)
 
-        pkgdir = "{}/packages".format(local_portage)
+        pkgdir = "{}/packages".format(cache_dir)
         os.makedirs(pkgdir, exist_ok=True)
 
         docker_args = options.OPTIONS.docker_command \
