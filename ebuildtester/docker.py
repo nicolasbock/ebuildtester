@@ -149,9 +149,8 @@ class Docker:
             docker = subprocess.Popen(docker_args)
             docker.wait()
 
-    def _create_container(self, docker_image, local_portage, overlays):
+    def _create_container(self, docker_image, portdir, overlays):
         """Create new container."""
-
 
         cache_dir = user_cache_dir("ebuildtester")
         os.makedirs(cache_dir, exist_ok=True)
@@ -161,6 +160,11 @@ class Docker:
 
         pkgdir = "{}/packages".format(cache_dir)
         os.makedirs(pkgdir, exist_ok=True)
+
+        if options.OPTIONS.batch:
+            portdir_opt = "ro"
+        else:
+            portdir_opt = "rw"
 
         docker_args = options.OPTIONS.docker_command \
             + ["create",
@@ -172,9 +176,9 @@ class Docker:
                "--security-opt", "apparmor:unconfined",
                "--device", "/dev/fuse",
                "--workdir", "/root",
-               "--volume", "%s:/var/db/repos/gentoo" % local_portage,
-               "--volume", "%s:/var/cache/distfiles" % distdir,
-               "--volume", "%s:/var/cache/binpkgs" % pkgdir]
+               "--volume", f"{portdir}:/var/db/repos/gentoo:{portdir_opt}",
+               "--volume", f"{distdir}:/var/cache/distfiles",
+               "--volume", f"{pkgdir}:/var/cache/binpkgs"]
 
         if options.OPTIONS.storage_opt:
             for s in options.OPTIONS.storage_opt:
