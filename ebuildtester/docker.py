@@ -261,6 +261,7 @@ class Docker:
 
         # Avoid wasting time generating the whole set
         self.execute('echo "C.UTF-8 UTF-8" > /etc/locale.gen')
+        self.execute(f'sed -i "s/250/{os.getuid()}/g" /etc/passwd')
 
     def _get_repo_names(self, overlay_dirs):
         """Get repo names from local overlay settings."""
