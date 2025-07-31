@@ -2,6 +2,7 @@
 
 import logging
 import os
+from platformdirs import user_log_dir
 
 from ebuildtester.atom import Atom
 
@@ -20,7 +21,8 @@ _log_fh = None
 log.addHandler(_log_ch)
 log.setLevel(logging.DEBUG)
 
-_logdir = os.getenv('XDG_STATE_HOME', '/tmp')
+_logdir = user_log_dir("ebuildtester")
+os.makedirs(_logdir, exist_ok=True)
 _logfile = None
 _log_filehandle = None
 
