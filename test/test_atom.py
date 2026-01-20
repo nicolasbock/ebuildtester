@@ -7,7 +7,7 @@ class TestAtom(unittest.TestCase):
     def test_equals(self):
         atom = Atom("=CATEGORY/PACKAGE-1.0.0")
         self.assertEqual(atom.__str__()[0], "=")
-        self.assertEqual(atom.__str__(), "=CATEGORY/PACKAGE-1.0.0")
+        self.assertEqual(atom.__str__(), "=CATEGORY/PACKAGE-1.0.0-r0")
 
     def test_slash_1(self):
         with self.assertRaises(AtomException) as e:
@@ -19,12 +19,21 @@ class TestAtom(unittest.TestCase):
         self.assertEqual(atom.package, "PACKAGE")
 
     def test_version(self):
-        self.assertEqual(Atom("CATEGORY/PACKAGE-1").version, "1")
-        self.assertEqual(Atom("CATEGORY/PACKAGE-1.0").version, "1.0")
-        self.assertEqual(
-            Atom("CATEGORY/PACKAGE-1.0-r1").version, "1.0-r1")
+        self.assertEqual(Atom("CATEGORY/PACKAGE-1").version, None)
+        self.assertEqual(Atom("CATEGORY/PACKAGE-NAME-1").version, None)
+        self.assertEqual(Atom("CATEGORY/PACKAGE-1.0-r1").version, None)
+        self.assertEqual(Atom("CATEGORY/P-NAME-1.0-r1").version, None)
+
+        self.assertEqual(Atom("=CATEGORY/PACKAGE-1").version, "1-r0")
+        self.assertEqual(Atom("=CATEGORY/PACKAGE-NAME-1").version, "1-r0")
+        self.assertEqual(Atom("=CATEGORY/PACKAGE-NAME-1.0").version, "1.0-r0")
+        self.assertEqual(Atom("=CATEGORY/PACKAGE-1.0-r1").version, "1.0-r1")
 
     def test_str(self):
         atom_1 = Atom("=CATEGORY/PACKAGE-1.0.0-r1")
         atom_2 = Atom(str(atom_1))
         self.assertEqual(atom_1, atom_2)
+        atom_3 = Atom("=CATEGORY/PACKAGE-NAME-1.0.0-r1")
+        atom_4 = Atom(str(atom_3))
+        self.assertEqual(atom_3, atom_4)
+
