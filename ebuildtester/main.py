@@ -16,12 +16,12 @@ def main():
     cfg = ConfigFile()
     options.OPTIONS = parse_commandline(sys.argv[1:], cfg.get_cfg())
     if len(options.OPTIONS.atom) > 0:
-        options.set_logfile('ebuildtester-'
-                            + ':'.join([f'{atom.category}-{atom.package}'
+        options.set_logfile('atoms:'
+                            + '_'.join([f'{atom.category}-{atom.package}'
                                         for atom in options.OPTIONS.atom])
                             + '.log')
     else:
-        options.set_logfile('ebuildtester-manual.log')
+        options.set_logfile('manual.log')
 
     if options.OPTIONS.debug:
         options.set_debugLoglevel()
