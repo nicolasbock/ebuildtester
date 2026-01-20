@@ -4,6 +4,7 @@ import os
 import re
 import sys
 import subprocess
+from platformdirs import user_cache_dir
 
 import ebuildtester.options as options
 from ebuildtester.utils import massage_string
@@ -148,14 +149,22 @@ class Docker:
             docker = subprocess.Popen(docker_args)
             docker.wait()
 
-    def _create_container(self, docker_image, local_portage, overlays):
+    def _create_container(self, docker_image, portdir, overlays):
         """Create new container."""
 
-        distdir = "{}/distfiles".format(local_portage)
+        cache_dir = user_cache_dir("ebuildtester")
+        os.makedirs(cache_dir, exist_ok=True)
+
+        distdir = "{}/distfiles".format(cache_dir)
         os.makedirs(distdir, exist_ok=True)
 
-        pkgdir = "{}/packages".format(local_portage)
+        pkgdir = "{}/packages".format(cache_dir)
         os.makedirs(pkgdir, exist_ok=True)
+
+        if options.OPTIONS.batch:
+            portdir_opt = "ro"
+        else:
+            portdir_opt = "rw"
 
         docker_args = options.OPTIONS.docker_command \
             + ["create",
@@ -167,9 +176,9 @@ class Docker:
                "--security-opt", "apparmor:unconfined",
                "--device", "/dev/fuse",
                "--workdir", "/root",
-               "--volume", "%s:/var/db/repos/gentoo" % local_portage,
-               "--volume", "%s:/var/cache/distfiles" % distdir,
-               "--volume", "%s:/var/cache/binpkgs" % pkgdir]
+               "--volume", f"{portdir}:/var/db/repos/gentoo:{portdir_opt}",
+               "--volume", f"{distdir}:/var/cache/distfiles",
+               "--volume", f"{pkgdir}:/var/cache/binpkgs"]
 
         if options.OPTIONS.storage_opt:
             for s in options.OPTIONS.storage_opt:
@@ -252,6 +261,7 @@ class Docker:
 
         # Avoid wasting time generating the whole set
         self.execute('echo "C.UTF-8 UTF-8" > /etc/locale.gen')
+        self.execute(f'sed -i "s/250/{os.getuid()}/g" /etc/passwd')
 
     def _get_repo_names(self, overlay_dirs):
         """Get repo names from local overlay settings."""
