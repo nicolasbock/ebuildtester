@@ -1,3 +1,5 @@
+**Important notice: the development of ebuildtester has been moved to https://github.com/OSPG/ebuildtester**
+
 Introduction
 ============
 
