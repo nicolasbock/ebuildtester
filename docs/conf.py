@@ -48,7 +48,7 @@ source_suffix = '.rst'
 # The master toctree document.
 master_doc = 'index'
 
-from pkg_resources import get_distribution
+from importlib.metadata import version as package_version
 
 # General information about the project.
 project = 'ebuildtester'
@@ -60,7 +60,7 @@ author = 'Nicolas Bock'
 # built documents.
 #
 # The full version, including alpha/beta/rc tags.
-release = get_distribution("ebuildtester").version
+release = package_version("ebuildtester")
 # The short X.Y version.
 version = release
 

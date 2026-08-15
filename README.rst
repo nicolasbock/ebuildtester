@@ -30,12 +30,11 @@ Requirements
 
 Using requirements are:
 
-- Python 3.10 or later,
+- Python 3.11 or later,
 - `Docker <https://www.docker.com/>`_
   (or any Docker-compatible tool like `Podman <https://podman.io/>`_),
 - `FUSE <https://wiki.gentoo.org/wiki/Filesystem_in_Userspace>`_,
-- `platformdirs <https://github.com/tox-dev/platformdirs/>`_,
-- `tomli <https://github.com/hukkin/tomli>`_.
+- `platformdirs <https://github.com/tox-dev/platformdirs/>`_.
 
 If you plan to use specific storage driver options (by passing
 ``--storage-opt``), be aware that these are specific to the `configured Docker

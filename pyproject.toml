@@ -1,0 +1,32 @@
+[build-system]
+requires = [
+    "setuptools>=61",
+    "setuptools-scm[toml]>=6.4",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ebuildtester"
+description = "A container approach to test a Gentoo package within a clean stage3 container"
+readme = { file = "README.rst", content-type = "text/x-rst" }
+requires-python = ">=3.11"
+license = { text = "BSD" }
+authors = [
+    { name = "Nicolas Bock", email = "nicolasbock@gmail.com" },
+]
+dependencies = [
+    "platformdirs",
+]
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "http://ebuildtester.readthedocs.io/"
+
+[project.scripts]
+ebuildtester = "ebuildtester.main:main"
+
+[tool.setuptools]
+packages = ["ebuildtester"]
+
+[tool.setuptools_scm]
+local_scheme = "no-local-version"

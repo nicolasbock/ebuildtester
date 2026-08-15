@@ -27,8 +27,8 @@ jobs:
 
       - name: Build and test
         run: |
-          python3 -m pip install --upgrade setuptools wheel
-          python3 setup.py sdist bdist_wheel
+          python3 -m pip install --upgrade build
+          python3 -m build --sdist --wheel
 
       - name: Store the distribution packages
         uses: actions/upload-artifact@v4

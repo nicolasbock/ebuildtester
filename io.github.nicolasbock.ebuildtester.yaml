@@ -10,8 +10,7 @@ modules:
   - name: ebuildtester
     buildsystem: simple
     build-commands:
-      - pip3 install --prefix /app --verbose .
-      - python setup.py install --prefix /app --verbose
+      - pip3 install --prefix /app --verbose --no-build-isolation .
       - install --verbose -D ebuildtester-wrapper.sh /app/bin/ebuildtester-wrapper
     sources:
       - type: dir

@@ -4,8 +4,7 @@ upload: dist
 	twine upload dist/*
 
 dist: distclean
-	python setup.py sdist
-	python setup.py bdist_wheel --universal
+	python -m build --sdist --wheel
 
 docs:
 	sphinx-apidoc --force --output-dir docs ebuildtester

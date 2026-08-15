@@ -1,4 +1,4 @@
-import tomli
+import tomllib
 from platformdirs import user_config_dir
 
 
@@ -12,7 +12,7 @@ class ConfigFile:
         self._cfg = None
         try:
             with open(cfg_file, mode="rb") as fp:
-                self._cfg = tomli.load(fp)
+                self._cfg = tomllib.load(fp)
         except FileNotFoundError:
             pass
 
