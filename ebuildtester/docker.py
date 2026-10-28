@@ -52,15 +52,32 @@ class Docker:
         else:
             cmd_string = cmd
         options.log.info("%s %s", self.cid[:6], cmd)
-        docker_cmd = options.OPTIONS.docker_command + ["exec", "--interactive"]
-        docker_cmd += [self.cid, "/bin/bash"]
-        docker = subprocess.Popen(docker_cmd,
-                                  stdout=subprocess.PIPE,
-                                  stderr=subprocess.PIPE,
-                                  stdin=subprocess.PIPE,
-                                  universal_newlines=True)
-        docker.stdin.write(cmd_string + "\n")
-        docker.stdin.close()
+        if sys.stderr.isatty() and not options.OPTIONS.batch:
+            # Attached to a terminal: allocate a tty on the container side
+            # so portage emits its own terminal title updates
+            # ("<hostname>: emerge: (X of Y) pkg"), which the readers below
+            # relay to the real terminal. This requires not attaching our
+            # piped stdin, hence the command is passed via -c.
+            docker_cmd = options.OPTIONS.docker_command + ["exec", "--tty"]
+            docker_cmd += [self.cid, "/bin/bash", "-c", cmd_string]
+            docker = subprocess.Popen(docker_cmd,
+                                      stdout=subprocess.PIPE,
+                                      stderr=subprocess.PIPE,
+                                      stdin=subprocess.DEVNULL,
+                                      universal_newlines=True)
+        else:
+            # Not attached to a terminal (or batch mode): keep the previous,
+            # escape-free behavior by running without a tty.
+            docker_cmd = options.OPTIONS.docker_command \
+                + ["exec", "--interactive"]
+            docker_cmd += [self.cid, "/bin/bash"]
+            docker = subprocess.Popen(docker_cmd,
+                                      stdout=subprocess.PIPE,
+                                      stderr=subprocess.PIPE,
+                                      stdin=subprocess.PIPE,
+                                      universal_newlines=True)
+            docker.stdin.write(cmd_string + "\n")
+            docker.stdin.close()
 
         stdout_reader = os.fork()
         if stdout_reader == 0:
